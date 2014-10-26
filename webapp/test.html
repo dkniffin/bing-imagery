@@ -17,7 +17,149 @@
          {
             // Initialize the map
             map = new Microsoft.Maps.Map(document.getElementById("myMap"),
-                         {credentials:"AkTTTMQd-8LqyzdIwyo7y6Z5b4bOZf5KV92t7udePeDzZRp9lClaVY5c0UBrL6Xg"});
+                  {
+                     credentials:"AkTTTMQd-8LqyzdIwyo7y6Z5b4bOZf5KV92t7udePeDzZRp9lClaVY5c0UBrL6Xg",
+                     center: new Microsoft.Maps.Location(40, -105.27),
+                     zoom: 15
+                  });
+
+            //points are counter-clockwise
+            var location1 = new Microsoft.Maps.Location(40,-105.27);
+            var location2 = new Microsoft.Maps.Location(40,-105.26);
+            var location3 = new Microsoft.Maps.Location(40.01,-105.26);
+            var location4 = new Microsoft.Maps.Location(40.01,-105.27);
+
+
+
+            // Create a polygon 
+            var vertices = [location1, location2, location3, location4];
+            var polygoncolor = new Microsoft.Maps.Color(100,100,0,100);
+            var polygon = new Microsoft.Maps.Polygon(vertices, {fillColor: polygoncolor, strokeColor: polygoncolor});
+
+            // Add the shape to the map
+            map.entities.push(polygon);
+
+            Microsoft.Maps.Events.addHandler(polygon, 'mousedown', DraggableStartDragHandler);
+            Microsoft.Maps.Events.addHandler(map, 'mousemove', DraggableDragHandler);
+            Microsoft.Maps.Events.addHandler(polygon, 'mouseup', DraggableEndDragHandler);
+            Microsoft.Maps.Events.addHandler(polygon, 'mouseout', DraggableEndDragHandler);
+
+            dragging = false;
+
+            //mousedown handler
+            function DraggableStartDragHandler(e) {
+                dragging = true;
+                previousLoc = map.tryPixelToLocation(new Microsoft.Maps.Point(e.getX(), e.getY()));
+            }
+
+            //mousemove handler
+            function DraggableDragHandler(e) {
+                if (dragging) {
+                    var loc = map.tryPixelToLocation(new Microsoft.Maps.Point(e.getX(), e.getY()));
+                    var latVariance = 0;
+                    var longVariance = 0;
+                    
+                    //determine variance
+                    latVariance = loc.latitude - previousLoc.latitude;
+                    longVariance = loc.longitude - previousLoc.longitude;
+                    
+                    previousLoc = loc;
+                    
+                    //adjust points in current shape
+                    var currentPoints = e.target.getLocations();
+                    for (var i = 0; i < currentPoints.length; i++) {
+                        currentPoints[i].latitude += latVariance;
+                        currentPoints[i].longitude += longVariance;
+                    }
+                    
+                    //set new points for polygon
+                    e.target.setLocations(currentPoints);
+                    
+                    e.handled = true;
+                }
+            }
+
+            //mouseup & mouseout handler
+            function DraggableEndDragHandler(e) {
+                dragging = false;
+            }
+
+            var options = {
+               DragHandleImage: 'images/DragHandleWhite.gif',                                      // Image for default drag handle
+               DragHandleImageActive: 'images/DragHandleGreen.gif',                                // Image for active drag handle
+               DragHandleImageHeight: 10,                                                          // Height for default and active drag handle image
+               DragHandleImageWidth: 10,                                                           // Width for default and active drag handle image
+               DragHandleImageAnchor: new Microsoft.Maps.Point(5, 5),                              // Anchor Point for drag handle image
+               shapeMaskStrokeColor: new Microsoft.Maps.Color(200, 100, 100, 100),                 // Line color of shape mask
+               shapeMaskFillColor: new Microsoft.Maps.Color(000, 000, 000, 000),                   // fill color of shape mask (polygon only)
+               shapeMaskStrokeThickness: 2,                                                        // line width of shape mask
+               shapeMaskStrokeDashArray: '2 2'                                                     // dash pattern of shape mask
+            }
+
+            dragHandleLayer = new Microsoft.Maps.EntityCollection()
+
+            var points = polygon.getLocations();
+
+            
+
+            for (i = 0; i < points.length; i++) {
+               var dragHandle = new Microsoft.Maps.Pushpin(points[i], { draggable: true, icon: options.DragHandleImage, height: options.DragHandleImageHeight, width: options.DragHandleImageWidth, anchor: options.DragHandleImageAnchor, typeName: 'BM_Module_DragHandle' });
+               Microsoft.Maps.Events.addHandler(dragHandle, 'dragstart', StartDragHandler);
+               Microsoft.Maps.Events.addHandler(dragHandle, 'drag', DragHandler);
+               Microsoft.Maps.Events.addHandler(dragHandle, 'dragend', EndDragHandler);
+               Microsoft.Maps.Events.addHandler(dragHandle, 'mouseover', MouseOverDragHandle);
+               Microsoft.Maps.Events.addHandler(dragHandle, 'mouseout', MouseOutDragHandle);
+               dragHandleLayer.push(dragHandle);
+            }
+
+            map.entities.push(dragHandleLayer);
+
+             //mouseover event handler
+            function MouseOverDragHandle(e) {
+               //Update handle image
+               e.target.setOptions({ icon: options.DragHandleImageActive });
+            }
+
+            //mouseout event handler
+            function MouseOutDragHandle(e) {
+               //Update handle image
+               e.target.setOptions({ icon: options.DragHandleImage });
+            }
+
+            //drag start event handler
+            function StartDragHandler(e) {
+               var handleLocation = e.entity.getLocation();
+
+               //Update handle image
+               e.entity.setOptions({ icon: options.DragHandleImageActive });
+
+               //Determine point index
+               for (i = 0; i <= (points.length - 1); i++) {
+                  if (handleLocation == points[i]) {
+                      _pointIndex = i;
+                      break;
+                  }
+               }
+            }
+
+            //drag event handler
+            function DragHandler(e) {
+               var loc = e.entity.getLocation();
+               points[_pointIndex] = loc;
+               if (_pointIndex == 0 && polygon.toString() == '[Polygon]') { points[points.length - 1] = loc; }
+               //polygonMask.setLocations(points);
+               polygon.setLocations(points);
+
+            }
+
+            //drag end event handler
+            function EndDragHandler(e) {
+               //Update handle image
+               e.entity.setOptions({ icon: options.DragHandleImage });
+
+               //Update source shape
+               polygon.setLocations(points);
+            }
 
             console.log(getCubeDetails(40.019117,40.018033,-105.270167,-105.287076));
             console.log(cubeURL(502302905,"RIGHT"));

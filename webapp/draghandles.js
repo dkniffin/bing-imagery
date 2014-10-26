@@ -168,7 +168,7 @@ function dragHandleModule(map, options) {
                 _shapeMask = new Microsoft.Maps.Polyline(_points, { strokeColor: _options.shapeMaskStrokeColor, strokeThickness: _options.shapeMaskStrokeThickness, strokeDashArray: _options.shapeMaskStrokeDashArray });
                 break;
             case '[Polygon]':
-                _shapeMask = new Microsoft.Maps.Polygon(_points, { fillColor: _options.shapeMaskFillColor, strokeColor: _options.shapeMaskStrokeColor, strokeThickness: _options.shapeMaskStrokeThickness, strokeDashArray: _options.shapeMaskStrokeDashArray });
+                _shapeMask = new Microsoft.Maps.Polygon(_points, { fillColor: new Microsoft.Maps.Color(100, 100, 000, 000), strokeColor: _options.shapeMaskStrokeColor, strokeThickness: _options.shapeMaskStrokeThickness, strokeDashArray: _options.shapeMaskStrokeDashArray });
                 break;
         }
 
