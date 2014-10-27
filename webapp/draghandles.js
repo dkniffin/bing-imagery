@@ -177,7 +177,7 @@ function dragHandleModule(map, options) {
         if (_shape.toString() == '[Polygon]') { lenOffset = 2 };
 
         for (i = 0; i <= (_points.length - lenOffset); i++) {
-            var dragHandle = new Microsoft.Maps.Pushpin(_points[i], { draggable: true, icon: _options.DragHandleImage, height: _options.DragHandleImageHeight, width: _options.DragHandleImageWidth, anchor: _options.DragHandleImageAnchor, typeName: 'BM_Module_DragHandle' });
+            var dragHandle = new Microsoft.Maps.Pushpin(_points[i], { draggable: false, icon: _options.DragHandleImage, height: _options.DragHandleImageHeight, width: _options.DragHandleImageWidth, anchor: _options.DragHandleImageAnchor, typeName: 'BM_Module_DragHandle' });
             Microsoft.Maps.Events.addHandler(dragHandle, 'dragstart', _StartDragHandler);
             Microsoft.Maps.Events.addHandler(dragHandle, 'drag', _DragHandler);
             Microsoft.Maps.Events.addHandler(dragHandle, 'dragend', _EndDragHandler);
