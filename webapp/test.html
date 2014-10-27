@@ -3,8 +3,11 @@
    <head>
       <title></title>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <link src=lib/css/main.css />
 
       <script type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+      <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+      <script type="text/javascript" src=lib/js/streetside.js></script>
 
       <script type="text/javascript">
 
@@ -211,18 +214,13 @@
                   dragHandles[i].setLocation(points[i]);
                 }
             }
+
+            console.log(getCubeDetails(40.019117,40.018033,-105.270167,-105.287076));
+            console.log(cubeURL(502302905,"RIGHT"));
          }
 
       </script>
-      <style>
-         #myMap {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-         }
-      </style>
+
    </head>
    <body onload="GetMap();">
       <div id='myMap'></div>
