@@ -9,18 +9,19 @@
 		<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 		<script type="text/javascript" src=lib/js/streetside.js></script>
 		<script type="text/javascript" src=lib/js/map.js></script>
+		<script type="text/javascript" src=lib/js/backend-interface.js></script>
 
 		<script type="text/javascript">
 			console.log(getCubeDetails(40.019117,40.018033,-105.270167,-105.287076));
 			console.log(cubeURL(502302905,"RIGHT"));
 		</script>
 	</head>
-	<body onload="GetMap();">
+	<body onload="onLoad();">
 		<div id='main'>
 			<div id='myMap'></div>
 		</div>
 		<div id='sidebar'>
-			<button id='start'>Start</button><br />
+			<button id='start' onClick="send();">Start</button><br />
 			<div id='boundInputs'>
 				<label for='top'>&#8593;</label><br />
 				<input type='text' id='top' /><br />

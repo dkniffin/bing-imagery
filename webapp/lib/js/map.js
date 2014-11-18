@@ -1,4 +1,4 @@
-function GetMap()
+function onLoad()
 {
   // Initialize the map
   var map = new Microsoft.Maps.Map(document.getElementById("myMap"),
