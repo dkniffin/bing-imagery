@@ -1,0 +1,8 @@
+{
+	"name" : "cu-bit",
+	"version" : "1.0.0",
+	"main": "webapp/server.js",
+	"dependencies" : { 
+		"express" : "1.0.0" 
+	}
+}
