@@ -1,8 +1,41 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+#main {
+	position: absolute;
+	right: 0;
+	left: 250px;
+	top: 0;
+	bottom: 0;
+}
+#sidebar {
+	position: absolute;
+	width: 250px;
+	left: 0;
+	top: 0;
+	bottom: 0;
+}
+#myMap {
+	position: relative;
+	width: 100%;
+	height: 100%;
 }
 
-a {
-  color: #00B7FF;
+/* Sidebar */
+button {
+	border-radius: 10px;
+	border: 0px;
+}
+#start {
+	height: 50px;
+	width: 200px;
+	margin: 20px;
+	background: #2C6700;
+	color: #FFF;
+}
+#boundInputs {
+	text-align: center;
+}
+#boundInputs input {
+	width: 30%;
+	display: inline-block;
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
