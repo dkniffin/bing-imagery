@@ -18,6 +18,7 @@
 - Backend detection component
   - If the database doesn't have any detections for the image, it should be processed for detections
   - Since it looks like we can do the detections inside of nodejs, we should try and do it that way, and see how it is, performance-wise. Also, make sure that works with Azure. Right now, the site is deployed in Azure's "website" type service. We may need to move to the "cloud" service to make this work.
+  - Note: Easy installation of the opencv nodejs module depends on this pull request: http://git.io/BquOKg
   - Assume that we have a model from the image detection group. For now, we can use the cv.FACE_CASCADE as a test model
 - Send results from backend to frontend
   - Once we have some results, we need to send them back, somehow
