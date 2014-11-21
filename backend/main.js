@@ -21,7 +21,6 @@ function getCubeIds(w,n,e,s,cb) {
 
 	var url = streetside_api_url + '?' + qs.stringify({c:1, n:n, s:s, e:e, w:w})
 
-	// TODO: remove dependency on jQuery. Maybe request?
 	request(url, function(err,res,data){
 		ids = _.map(JSON.parse(data).slice(1),function(obj){ return obj["id"]});
 		cb(ids)

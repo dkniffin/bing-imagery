@@ -1,0 +1,26 @@
+- Refactor/organize frontend map code
+  - Specifically, expose get/set functions for the bounding box lat/lon values
+- Frontend UI
+  - I've started on a basic UI for the frontend, including a start button, and some text boxes for manually changing the lat/lons of the bounding box. However the UI is not connected to the map code. Ideally, we want it so that when we change the values of the bounding box in the UI, it is reflected on the map.
+  - Start playing around with ways to display a bunch of detection results (either small pngs, or text values).
+    - Marker clusters? (like http://tinyurl.com/nt67nm2) Not sure if bing has a way of doing that easily.
+    - List of results in the sidebar?
+    - List of results in a popup for each cube?
+  - We might also want to consider a way for humans to mark incorrect results. That would include some backend components as well.
+- Write the code to connect the front end and backend
+  - Basically, this will be: get the bounding box, send it to the backend, then wait for a response
+  - For this, we might want to consider using websockets. The advantage is that the server can respond asynchronously, as it finds detections, rather than all at once. If you need help with this, let me know. I've used websockets before.
+- Connect the backend to a database
+  - When the backend recieves a new bounding box, it should first query streetside. I've already written the code to do that.
+  - For each streetside image, query the database for any detections it already has on that image
+  - After more detections are found, it should write them to the DB
+  - The detections should be stored as a simple pixel bounding box, indicating where the detection was found in the original image
+- Backend detection component
+  - If the database doesn't have any detections for the image, it should be processed for detections
+  - Since it looks like we can do the detections inside of nodejs, we should try and do it that way, and see how it is, performance-wise. Also, make sure that works with Azure. Right now, the site is deployed in Azure's "website" type service. We may need to move to the "cloud" service to make this work.
+  - Assume that we have a model from the image detection group. For now, we can use the cv.FACE_CASCADE as a test model
+- Send results from backend to frontend
+  - Once we have some results, we need to send them back, somehow
+  - This ties into the point above, with connecting the front end to backend, and depends on whether we use websockets or not
+  - What we will have is the streetside image URL, and a pixel bounding box. We'll need to send just that bounding box as the result
+  - Look into the gm nodejs module and http://stackoverflow.com/a/12665226 for cropping image on the fly
