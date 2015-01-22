@@ -3,6 +3,9 @@ var Combinatorics = require('js-combinatorics').Combinatorics
 , qs = require('querystring')
 , _ = require('underscore')
 
+, db = require('./db.js')
+, detector = require('./detector.js')
+
 function base4(dec) {
 	return Number(dec).toString(4);
 }
@@ -43,13 +46,11 @@ function imgURL(id,dir,zoom_coords) {
 }
 
 
-function imgURLs(ids,dirs,zoom,cb) {
-	ids.forEach(function(id){
-		dirs.forEach(function(dir){
-			var all_zoom_coords = Combinatorics.baseN([0,1,2,3],zoom)
-			all_zoom_coords.toArray().forEach(function(zoom_coords){
-				cb(imgURL(id,dir,zoom_coords))
-			})
+function imgURLs(id,dirs,zoom,cb) {
+	dirs.forEach(function(dir){
+		var all_zoom_coords = Combinatorics.baseN([0,1,2,3],zoom)
+		all_zoom_coords.toArray().forEach(function(zoom_coords){
+			cb(imgURL(id,dir,zoom_coords))
 		})
 	})
 }
@@ -58,10 +59,24 @@ exports.getDetections = function(w,n,e,s) {
 	var zoom = 3
 	var dirs = ['LEFT','RIGHT']
 	getCubeIds(w,n,e,s, function(cubeIds){
-		// TODO: Compare to DB
-		// Generate URLS
-		var imageURLs = imgURLs(cubeIds,dirs,zoom,function(url){
-			console.log(url)
+		cubeIds.forEach(function(cubeId){
+			// Compare to DB
+			db.detections(cubeId,function(detections,err){
+				if (err == 'NoDetectionsError') {
+					// Detection hasn't been run on this cube
+					// Generate URLS
+					var imageURLs = imgURLs(cubeId,dirs,zoom,function(url){
+						// Find detections
+						detector.detect(url,function(detections,err){
+							// TODO: Send detections to database
+							db.addDetections(cubeId,detections)
+							// TODO: Send results to frontend
+						})
+					})
+				} else {
+					// TODO: Send results to frontend
+				}
+			})
 		})
 	})
 }
