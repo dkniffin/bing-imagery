@@ -14,6 +14,10 @@
     // done();
 // });
 
+// SELECT * FROM detections
+//   LEFT JOIN images
+//     ON detections.image_id=images.id;
+
 exports.detections = function(cubeId,cb) {
 	console.log('querying database')
 	var detections = []
