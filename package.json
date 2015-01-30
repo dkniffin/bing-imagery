@@ -19,6 +19,7 @@
     "jsonp": "0.0.4",
     "querystring": "~0.2.0",
     "request": "~2.48.0",
-    "underscore": "~1.7.0"
+    "underscore": "~1.7.0",
+    "async": "~0.9.0"
   }
 }

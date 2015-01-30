@@ -2,6 +2,7 @@ var Combinatorics = require('js-combinatorics').Combinatorics
 , request = require('request')
 , qs = require('querystring')
 , _ = require('underscore')
+, async = require('async')
 
 , db = require('./db.js')
 , detector = require('./detector.js')
@@ -18,7 +19,7 @@ function pad(num, size) {
 
 
 
-function getCubeIds(w,n,e,s,cb) {
+function getCubeIds(n,s,e,w,cb) {
 	var streetside_api_url = "http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx";
 	var ids = [];
 
@@ -55,28 +56,47 @@ function imgURLs(id,dirs,zoom,cb) {
 	})
 }
 
-exports.getDetections = function(w,n,e,s) {
+function handleDBDetection(detections,err){
+	if (err == 'NoDetectionsError') {
+		// Detection hasn't been run on this cube
+		// Generate URLS
+		imgURLs(cubeId,dirs,zoom,findDetections)
+	} else {
+		// Send results to frontend
+		detections.forEach(function(detection){
+			sendDetections(detection)
+		})
+	}
+}
+
+function findDetections(url){
+	// Find detections
+	detector.detect(url,handleDetections);
+}
+
+function handleDetections(detections,cubeId,add_to_db){
+	add_to_db = add_to_db || false // default value
+	if (add_to_db) {
+		// Add detections to the database
+		db.addDetections(cubeId,detections)
+	}
+	//Send results to frontend
+	detections.forEach(function(detection){
+		sendDetections(detection)
+	})
+}
+
+function sendDetection(detection){
+	// TODO: Use websockets to return detection to frontend
+}
+exports.getDetections = function(n,s,e,w) {
 	var zoom = 3
 	var dirs = ['LEFT','RIGHT']
-	getCubeIds(w,n,e,s, function(cubeIds){
+
+	getCubeIds(n,s,e,w,function(cubeIds){
 		cubeIds.forEach(function(cubeId){
 			// Compare to DB
-			db.detections(cubeId,function(detections,err){
-				if (err == 'NoDetectionsError') {
-					// Detection hasn't been run on this cube
-					// Generate URLS
-					var imageURLs = imgURLs(cubeId,dirs,zoom,function(url){
-						// Find detections
-						detector.detect(url,function(detections,err){
-							// TODO: Send detections to database
-							db.addDetections(cubeId,detections)
-							// TODO: Send results to frontend
-						})
-					})
-				} else {
-					// TODO: Send results to frontend
-				}
-			})
+			db.detections(cubeId,handleDBDetection)
 		})
 	})
 }
