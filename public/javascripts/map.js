@@ -93,7 +93,37 @@ Map.prototype = {
 
   draggableEndDragHandler: function(e) {
     this.polygon.dragging = false;
+  },
+
+  getNSEW: function() {
+    locs = this.polygon._microsoft.getLocations();
+    lats = _.pluck(locs, 'latitude');
+    lons = _.pluck(locs, 'longitude');
+
+    var n = reduceHelper(lats, (greaterThan));
+    var s = reduceHelper(lats, lessThan);
+    var e = reduceHelper(lons, greaterThan);
+    var w = reduceHelper(lons, lessThan);
+
+    return {n: n, s: s, e: e, w: w}
   }
 }
+
+//Oh ES6 how I wish you were everywhere... (a, b) => a > b
+
+function greaterThan(a, b) {
+  return a > b;
+}
+
+function lessThan(a, b) {
+  return a < b;
+}
+
+function reduceHelper(col, compareFunc) {
+  return _.reduce(col, function(acc, el) {
+    return (compareFunc(el, acc) ? el : acc)
+  })
+}
+
 
 module.exports = Map;
