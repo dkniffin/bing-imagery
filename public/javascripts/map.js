@@ -23,9 +23,6 @@ function Map(el, center, zoom) {
 }
 
 Map.prototype = {
-  createChildren: function() {
-  },
-
   createPolygon: function() {
     var location1 = new Microsoft.Maps.Location(40,-105.27);
     var location2 = new Microsoft.Maps.Location(40,-105.26);
