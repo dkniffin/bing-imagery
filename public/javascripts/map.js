@@ -97,10 +97,10 @@ Map.prototype = {
     lats = _.pluck(locs, 'latitude');
     lons = _.pluck(locs, 'longitude');
 
-    var n = reduceHelper(lats, (greaterThan));
-    var s = reduceHelper(lats, lessThan);
-    var e = reduceHelper(lons, greaterThan);
-    var w = reduceHelper(lons, lessThan);
+    var n = _.reduce(lats, biggest);
+    var s = _.reduce(lats, smallest);
+    var e = _.reduce(lons, biggest);
+    var w = _.reduce(lons, smallest);
 
     return {n: n, s: s, e: e, w: w}
   }
@@ -108,18 +108,12 @@ Map.prototype = {
 
 //Oh ES6 how I wish you were everywhere... (a, b) => a > b
 
-function greaterThan(a, b) {
-  return a > b;
+function biggest(acc, el) {
+  return (el > acc ? el : acc);
 }
 
-function lessThan(a, b) {
-  return a < b;
-}
-
-function reduceHelper(col, compareFunc) {
-  return _.reduce(col, function(acc, el) {
-    return (compareFunc(el, acc) ? el : acc)
-  })
+function smallest(acc, el) {
+  return (el < acc ? el : acc);
 }
 
 
