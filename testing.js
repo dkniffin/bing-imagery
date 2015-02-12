@@ -13,6 +13,16 @@
 
 
 var backend = require('./backend/main.js')
+var db = require('./backend/db.js')
 
+// db.detections('1234',function(err,detections){
+// 	if (err == 'NoDetectionsError') {
+// 		console.log('no detections found')
+// 	} else {
+// 		console.log(detections);
+// 	}
+// })
 
-backend.getDetections(-105.2760262489,40.0183993312,-105.2750627995,40.0176456418)
+backend.getDetections(40.0183993312,40.0176456418,-105.2750627995,-105.2760262489,function(detection,err){
+	console.log(detection)
+})

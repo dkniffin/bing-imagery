@@ -3,7 +3,7 @@ var router = express.Router();
 var backend = require('../backend/main.js')
 
 /* GET users listing. */
-router.get('/', function(req, res) {
+router.get('/detections', function(req, res) {
   //res.send('respond with a resource');
   // TODO: Look into gm and http://stackoverflow.com/a/12665226 for cropping image and sending result back
   // TODO: Check out http://stackoverflow.com/a/19386223 for sending back multiple images
