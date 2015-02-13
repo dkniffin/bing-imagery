@@ -3,17 +3,27 @@ head
     title
     meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
     link(href='stylesheets/style.css', rel='stylesheet', type='text/css')
-    link(href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css", rel='stylesheet', type='text/css')
-    link(href='stylesheets/leaflet-locationfilter.css', rel='stylesheet', type='text/css')
+    script(type='text/javascript', src='http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0')
     script(type='text/javascript', src='http://code.jquery.com/jquery-2.1.1.min.js')
     script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js')
     script(type='text/javascript', src='javascripts/bundle.js', defer)
     script(type='text/javascript', src='https://cdn.socket.io/socket.io-1.2.0.js')
-    script(type='text/javascript', src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js")
-    script(type='text/javascript', src='javascripts/leaflet-bing.js')
-    script(type='text/javascript', src='javascripts/leaflet-locationfilter.js')
   body
     #main
       #myMap
     #sidebar
       button#start(onclick='send();') Start
+      br
+      #boundInputs
+        label(for='top') ↑
+        br
+        input#top(type='text')
+        br
+        label(for='left') ←
+        input#left(type='text')
+        input#right(type='text')
+        label(for='right') →
+        br
+        input#bottom(type='text')
+        br
+        label(for='bottom') ↓
