@@ -1,6 +1,7 @@
+USE BitDetections;
 CREATE TABLE images
 (
-	id int PRIMARY KEY NOT NULL,
+	id int PRIMARY KEY NOT NULL IDENTITY,
 	cube_id int NOT NULL,
 	lat decimal,
 	lon decimal,
@@ -14,7 +15,7 @@ CREATE INDEX cube_id_index
 ON images (cube_id);
 
 CREATE TABLE detections (
-	id int PRIMARY KEY NOT NULL,
+	id int PRIMARY KEY NOT NULL IDENTITY,
 	image_id int NOT NULL,
 	x_min int,
 	x_max int,

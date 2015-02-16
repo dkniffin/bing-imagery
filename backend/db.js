@@ -1,3 +1,33 @@
+var async = require('async')
+
+// Monkey patch to get objectMap
+async.objectMap = function ( obj, func, cb ) {
+	var i, arr = [], keys = Object.keys( obj );
+	for ( i = 0; i < keys.length; i += 1 ) {
+		var wrapper = {};
+		wrapper[keys[i]] = obj[keys[i]];
+		arr[i] = wrapper;
+	}
+	this.map( arr, func, function( err, data ) {
+		if ( err ) { return cb( err ); }
+		var res = {};
+		for ( i = 0; i < data.length; i += 1 ) {
+			res[keys[i]] = data[i];
+		}
+		return cb( err, res );
+	});
+}
+
+function rowToObj(row,cb) {
+	async.objectMap(row, function(obj,map_cb){
+		var key = Object.keys(obj)[0];
+		map_cb(null,obj[key]['value'])
+	}, function(err,results){
+		cb(err,results)
+	})
+}
+
+
 //var config = require('./db-config')
 var Connection = require('tedious').Connection,
 	TYPES = require('tedious').TYPES,
@@ -6,16 +36,51 @@ var Connection = require('tedious').Connection,
     pooler = new TediousPooler(config),
     Request = require('tedious').Request;
 
-exports.detections = function(imgObj,cb) {
+function detections(imgObj,cb) {
 	// cb -> function(detections,err)
-	// console.log(imgObj['cube_id'],imgObj['direction'],imgObj['zoom_coords'][0])
+	getImageId(imgObj,function(err,imgId){
+		if (err == 'NoImageError') {
+			addImage(imgObj,function(err,result){
+				if (err) {
+					cb(err,null)
+				} else {
+					cb('NoDetectionsError',null)
+				}
+			})
+		} else if (err) {
+			cb(err,null)
+		} else {
+			getDetectionsFromImgId(imgId,cb)
+		}
+	})
+}
 
+function getDetectionsFromImgId(imgId,cb) {
 	var detections = []
 	var err = null
 
 	var q = "SELECT * FROM detections " +
-			"LEFT JOIN images " +
-				"ON detections.image_id=images.id ";
+			"WHERE image_id = @img_id ";
+
+	var request = new Request(q, function(err,rowCount,rows){
+		if (err) {
+			cb(err,null)
+		} else if (rowCount == 0) {
+			cb('NoDetectionsError',null)
+		} else {
+			rows.forEach(function(row){
+				rowToObj(row,cb)
+			})
+		}
+	})
+	request.addParameter('img_id',TYPES.Int,imgId)
+
+	// console.log('querying database')
+	pooler.execute(function(connection){ connection.execSql(request);});
+}
+
+function getImageId(imgObj,cb) {
+	var q = "SELECT id FROM images " +
 			"WHERE cube_id = @cube_id " +
 			"AND direction = @direction " +
 			"AND zoom_1_coord = @zoom_1_coord " +
@@ -25,12 +90,12 @@ exports.detections = function(imgObj,cb) {
 
 	var request = new Request(q, function(err,rowCount,rows){
 		if (err) {
-			cb(null,err)
+			cb(err,null)
 		} else if (rowCount == 0) {
-			cb(null,'NoDetectionsError')
+			cb('NoImageError',null)
 		} else {
 			rows.forEach(function(row){
-				cb(row,null)
+				cb(null,row['id']['value'])
 			})
 		}
 	})
@@ -41,11 +106,32 @@ exports.detections = function(imgObj,cb) {
 	request.addParameter('zoom_3_coord',TYPES.TinyInt,imgObj['zoom_coords'][2])
 	request.addParameter('zoom_4_coord',TYPES.TinyInt,imgObj['zoom_coords'][3])
 
-	// console.log('querying database')
 	pooler.execute(function(connection){ connection.execSql(request);});
 }
 
-exports.addDetection = function(imgObj,detection) {
+function addImage(imgObj, cb) {
+	var q = "INSERT INTO images (cube_id,lat,lon,direction,zoom_1_coord,zoom_2_coord,zoom_3_coord,zoom_4_coord) " +
+	        "VALUES (@cube_id,@lat,@lon,@dir,@z1,@z2,@z3,@z4);"
+
+	var request = new Request(q, function(err,rowCount,rows){
+		if (err) {
+			cb(err,null)
+		}
+	})
+
+	request.addParameter('cube_id',TYPES.Int,imgObj['cube_id'])
+	request.addParameter('lat',TYPES.Int,imgObj['lat'])
+	request.addParameter('lon',TYPES.Int,imgObj['lon'])
+	request.addParameter('dir',TYPES.TinyInt,imgObj['direction'])
+	request.addParameter('z1',TYPES.TinyInt,imgObj['zoom_coords'][0])
+	request.addParameter('z2',TYPES.TinyInt,imgObj['zoom_coords'][1])
+	request.addParameter('z3',TYPES.TinyInt,imgObj['zoom_coords'][2])
+	request.addParameter('z4',TYPES.TinyInt,imgObj['zoom_coords'][3])
+
+	pooler.execute(function(connection){ connection.execSql(request);});
+}
+
+function addDetection(imgObj,detection) {
 
 	console.log('adding detection to database')
 
@@ -73,4 +159,10 @@ exports.addDetection = function(imgObj,detection) {
 	// 		})
 	// 	})
 	// })
+}
+
+module.exports = exports = {
+	detections: detections,
+	getDetectionsFromImageId: getDetectionsFromImgId,
+	getImageId: getImageId
 }

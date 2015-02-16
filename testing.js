@@ -23,6 +23,14 @@ var db = require('./backend/db.js')
 // 	}
 // })
 
-backend.getDetections(40.0183993312,40.0176456418,-105.2750627995,-105.2760262489,function(detection,err){
-	console.log(detection)
+// backend.getDetections(40.0183993312,40.0176456418,-105.2750627995,-105.2760262489,function(detection,err){
+// 	console.log(detection)
+// })
+
+// db.getDetectionsFromImgId('1',function(err,detection){
+// 	console.log(detection)
+// })
+
+db.detections({cube_id: 123, direction: 1, zoom_coords: [0,0,0,0]},function(err,detection){
+	console.log(err,detection)
 })
