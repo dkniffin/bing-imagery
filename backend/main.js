@@ -118,3 +118,15 @@ exports.getDetections = function(n,s,e,w,cb) {
 		})
 	})
 }
+
+exports.getURLs = function(n,s,e,w,cb) {
+	var zoom = 3
+	var dirs = ['LEFT','RIGHT']
+
+	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
+		imgs.forEach(function(imgObj){
+			var url = imgURL(imgObj);
+			cb(null,url)
+		})
+	})
+}
