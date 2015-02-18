@@ -111,11 +111,15 @@ function getImageId(imgObj,cb) {
 
 function addImage(imgObj, cb) {
 	var q = "INSERT INTO images (cube_id,lat,lon,direction,zoom_1_coord,zoom_2_coord,zoom_3_coord,zoom_4_coord) " +
+	        "OUTPUT Inserted.ID " +
 	        "VALUES (@cube_id,@lat,@lon,@dir,@z1,@z2,@z3,@z4);"
 
 	var request = new Request(q, function(err,rowCount,rows){
 		if (err) {
 			cb(err,null)
+		} else {
+			// return imgId
+			cb(null,rows[0]['ID']['value'])
 		}
 	})
 
@@ -128,41 +132,52 @@ function addImage(imgObj, cb) {
 	request.addParameter('z3',TYPES.TinyInt,imgObj['zoom_coords'][2])
 	request.addParameter('z4',TYPES.TinyInt,imgObj['zoom_coords'][3])
 
-	pooler.execute(function(connection){ connection.execSql(request);});
+	pooler.execute(function(connection){ connection.execSql(request) });
 }
 
-function addDetection(imgObj,detection) {
+function addDetection(imgObj,detection,cb) {
 
 	console.log('adding detection to database')
 
+	var q = "INSERT INTO detections (image_id, x_min, x_max, y_min, y_max)" +
+			"OUTPUT Inserted.ID " +
+			"VALUES (@image_id,@x_min,@x_max,@y_min,@y_max);"
+	var request = new Request(q, function(err,rowCount,rows){
+		if (err) {
+			cb(err,null)
+		} else {
+			// return detectionId
+			cb(null,rows[0]['ID']['value'])
+		}
+	})
+
+	request.addParameter('x_min',TYPES.Int,detection['x_min'])
+	request.addParameter('x_max',TYPES.Int,detection['x_max'])
+	request.addParameter('y_min',TYPES.Int,detection['y_min'])
+	request.addParameter('y_max',TYPES.Int,detection['y_max'])
+
 	// TODO: If imgObj isn't in database, add it
-
-	// var q = "INSERT INTO detections (image_id, x_min, x_max, y_min, y_max)" +
-	// 		"VALUES (@image_id,@x_min,@x_max,@y_min,@y_max);"
-
-	// var conn = new Connection(config);
-	// conn.on('connect',function(err){
-	// 	if (err) { console.error(err) }
-
-	// 	request = new Request(q, function(err,rowCount){
-	// 		if(err) {
-	// 			console.error(err);
-	// 		} else {
-	// 			console.log(rowCount + ' rows');
-	// 		}
-	// 	})
-	// 	request.addParameter('image_id',TYPES.Int,0);
-
-	// 	request.on('row',function(columns){
-	// 		columns.forEach(function(column){
-	// 			console.log(column.value);
-	// 		})
-	// 	})
-	// })
+	getImageId(imgObj,function(err,imgId){
+		if (err == 'NoImageError'){
+			addImage(imgObj,function(err,imgId){
+				// The image has been added to the DB. Add the detection.
+				request.addParameter('image_id',TYPES.Int,imgId)
+				pooler.execute(function(connection){ connection.execSql(request) })
+			})
+		} else if (err) {
+			cb(err, null)
+		} else {
+			// The image is in the database. Add the detection.
+			request.addParameter('image_id',TYPES.Int,imgId)
+			pooler.execute(function(connection){ connection.execSql(request) })
+		}
+	})
 }
 
 module.exports = exports = {
 	detections: detections,
 	getDetectionsFromImageId: getDetectionsFromImgId,
-	getImageId: getImageId
+	getImageId: getImageId,
+	addImage: addImage,
+	addDetection: addDetection
 }

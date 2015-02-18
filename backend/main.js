@@ -90,7 +90,7 @@ exports.getDetections = function(n,s,e,w,cb) {
 	var dirs = ['LEFT','RIGHT']
 
 	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
-		if (err) { return }
+		if (err) { return } // TODO: cb
 		imgs.forEach(function(imgObj){
 			// console.log('processing image object ')
 			db.detections(imgObj,function(detection, err){
@@ -109,7 +109,7 @@ exports.getDetections = function(n,s,e,w,cb) {
 						})
 					})
 				} else if (err != null) {
-					//console.error(err)
+					//console.error(err) // TODO: cb
 				} else {
 					// Send results to frontend
 					cb(detection,null)

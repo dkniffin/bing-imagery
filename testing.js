@@ -23,14 +23,31 @@ var db = require('./backend/db.js')
 // 	}
 // })
 
+// Gets all detections within a bounding box
 // backend.getDetections(40.0183993312,40.0176456418,-105.2750627995,-105.2760262489,function(detection,err){
 // 	console.log(detection)
 // })
 
+
+// Database tests
+// Gets detections with a given img id
 // db.getDetectionsFromImgId('1',function(err,detection){
 // 	console.log(detection)
 // })
 
-db.detections({cube_id: 123, direction: 1, zoom_coords: [0,0,0,0]},function(err,detection){
-	console.log(err,detection)
+// Gets all detections for a given imgObj
+// db.detections({cube_id: 123, direction: 1, zoom_coords: [0,0,0,0]},function(err,detection){
+// 	console.log(err,detection)
+// })
+
+// Adds an image to the database, returning the image id
+// db.addImage({cube_id: 123, direction: 1, zoom_coords: [0,0,0,0]},function(err,imgId){
+// 	console.log(imgId)
+// })
+
+// Adds a detection to the database
+db.addDetection({cube_id: 123, direction: 1, zoom_coords: [0,0,0,0]},
+				{x_min: 0, x_max: 0, y_min: 0, y_max: 0},
+				function(err,detectionId){
+	console.log(detectionId)
 })
