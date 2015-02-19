@@ -34,14 +34,12 @@ app.use(function(req, res, next) {
     next(err);
 });
 
-function getDetectionListener(data) {
-    console.log(data);
-
-    backend.getDetections(data['n'],data['s'],data['e'],data['w'],function(detection){
-        socket.emit('receiveDetection', {detection: detection});
-    })
-}
-
 io.on('connection', function (socket) {
-    socket.on('getDetection', getDetectionListener);
+    socket.on('getDetection', function(data) {
+        console.log(data);
+
+        backend.getURLs(data['n'],data['s'],data['e'],data['w'],function(temp, data){
+            socket.emit('receiveDetection', data);
+        })
+    });
 });

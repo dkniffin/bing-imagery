@@ -126,7 +126,30 @@ exports.getURLs = function(n,s,e,w,cb) {
 	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
 		imgs.forEach(function(imgObj){
 			var url = imgURL(imgObj);
-			cb(null,url)
+
+			//Dummy object to hold legitimate url and illegitimate points.
+			var data = {
+				url: imgURL(imgObj),
+				points: {
+					tr: {
+						x: 1,
+						y: 1
+					},
+					tl: {
+						x: -1,
+						y: 1
+					},
+					bl: {
+						x: -1,
+						y: -1
+					},
+					br: {
+						x:1,
+						y:-1
+					}
+				}
+			}
+			cb(null,data)
 		})
 	})
 }
