@@ -95,12 +95,11 @@ exports.getDetections = function(n,s,e,w,cb) {
 			// console.log('processing image object '+imgObj['cube_id'])
 			// console.log('processing image '+imgURL(imgObj))
 			db.detections(imgObj,function(err, detection){
-				console.log('meh')
+				var url = imgURL(imgObj);
 				if (err == 'NoDetectionsError') {
 					// console.log('running detector for '+imgObj['cube_id'])
 					// Detection hasn't been run on this cube
 					// Run detector
-					var url = imgURL(imgObj);
 					detector.detect(url, function(err,detections){
 						async.each(detections,function(detection, detect_cb){
 							// console.log('found detection')
@@ -108,7 +107,12 @@ exports.getDetections = function(n,s,e,w,cb) {
 							db.addDetection(imgObj,detection)
 
 							//Send results to frontend
-							cb(err,detection)
+							cb(err,{
+								url: url,
+								lat: imgObj['lat'],
+								lon: imgObj['lon'],
+								detect_coords: detection
+							})
 
 							detect_cb()
 							img_cb()
@@ -118,7 +122,12 @@ exports.getDetections = function(n,s,e,w,cb) {
 					console.error(err) // TODO: cb
 				} else {
 					// Send results to frontend
-					cb(null,detection)
+					cb(null,{
+						url: url,
+						lat: imgObj['lat'],
+						lon: imgObj['lon'],
+						detect_coords: detection
+					})
 				}
 			})
 		})
