@@ -1,4 +1,7 @@
 var async = require('async')
+, pool = require('./ms-pooler')
+, Request = require('tedious').Request
+, TYPES = require('tedious').TYPES
 
 // Monkey patch to get objectMap
 async.objectMap = function ( obj, func, cb ) {
@@ -28,17 +31,32 @@ function rowToObj(row,cb) {
 }
 
 
-//var config = require('./db-config')
-var Connection = require('tedious').Connection,
-	TYPES = require('tedious').TYPES,
-	TediousPooler = require('./TediousPooler'),
-	config = require('./db-config'),
-    pooler = new TediousPooler(config),
-    Request = require('tedious').Request;
+function query(request,params){
+	// console.log('DB: querying')
+	// console.log(request)
+	pool.acquire(function(err, connection) {
+		// console.log('DB: connection acquired')
+		if (err) { console.log(err) }
+		request.on('doneProc', function (rowCount, more, rows) {
+			console.log('DB: query done')
+			pool.release(connection);
+		});
+
+		request.on('prepared', function(){
+			console.log('DB: executing request')
+			connection.execute(request, params)
+		})
+
+		// console.log('DB: preparing statement')
+		connection.prepare(request);
+	});
+}
 
 function detections(imgObj,cb) {
 	// cb -> function(detections,err)
+	// console.log('DB: getting db detections')
 	getImageId(imgObj,function(err,imgId){
+		// console.log('DB: image id ' + err + ' ' + imgId)
 		if (err == 'NoImageError') {
 			addImage(imgObj,function(err,result){
 				if (err) {
@@ -73,10 +91,12 @@ function getDetectionsFromImgId(imgId,cb) {
 			})
 		}
 	})
-	request.addParameter('img_id',TYPES.Int,imgId)
+	request.addParameter('img_id',TYPES.Int)
 
 	// console.log('querying database')
-	pooler.execute(function(connection){ connection.execSql(request);});
+	query(request, {
+		img_id: imgId
+	})
 }
 
 function getImageId(imgObj,cb) {
@@ -99,22 +119,31 @@ function getImageId(imgObj,cb) {
 			})
 		}
 	})
-	request.addParameter('cube_id',TYPES.Int,imgObj['cube_id'])
-	request.addParameter('direction',TYPES.TinyInt,imgObj['direction'])
-	request.addParameter('zoom_1_coord',TYPES.TinyInt,imgObj['zoom_coords'][0])
-	request.addParameter('zoom_2_coord',TYPES.TinyInt,imgObj['zoom_coords'][1])
-	request.addParameter('zoom_3_coord',TYPES.TinyInt,imgObj['zoom_coords'][2])
-	request.addParameter('zoom_4_coord',TYPES.TinyInt,imgObj['zoom_coords'][3])
+	request.addParameter('cube_id',TYPES.Int)
+	request.addParameter('direction',TYPES.TinyInt)
+	request.addParameter('zoom_1_coord',TYPES.TinyInt)
+	request.addParameter('zoom_2_coord',TYPES.TinyInt)
+	request.addParameter('zoom_3_coord',TYPES.TinyInt)
+	request.addParameter('zoom_4_coord',TYPES.TinyInt)
 
-	pooler.execute(function(connection){ connection.execSql(request);});
+	query(request, {
+		cube_id: imgObj['cube_id'],
+		direction: imgObj['direction'],
+		zoom_1_coord: imgObj['zoom_coords'][0],
+		zoom_2_coord: imgObj['zoom_coords'][1],
+		zoom_3_coord: imgObj['zoom_coords'][2],
+		zoom_4_coord: imgObj['zoom_coords'][3]
+	})
 }
 
 function addImage(imgObj, cb) {
+	console.log('DB: adding image')
 	var q = "INSERT INTO images (cube_id,lat,lon,direction,zoom_1_coord,zoom_2_coord,zoom_3_coord,zoom_4_coord) " +
 	        "OUTPUT Inserted.ID " +
 	        "VALUES (@cube_id,@lat,@lon,@dir,@z1,@z2,@z3,@z4);"
 
 	var request = new Request(q, function(err,rowCount,rows){
+		console.log('DB: add image finished')
 		if (err) {
 			cb(err,null)
 		} else {
@@ -123,31 +152,43 @@ function addImage(imgObj, cb) {
 		}
 	})
 
-	request.addParameter('cube_id',TYPES.Int,imgObj['cube_id'])
-	request.addParameter('lat',TYPES.Int,imgObj['lat'])
-	request.addParameter('lon',TYPES.Int,imgObj['lon'])
-	request.addParameter('dir',TYPES.TinyInt,imgObj['direction'])
-	request.addParameter('z1',TYPES.TinyInt,imgObj['zoom_coords'][0])
-	request.addParameter('z2',TYPES.TinyInt,imgObj['zoom_coords'][1])
-	request.addParameter('z3',TYPES.TinyInt,imgObj['zoom_coords'][2])
-	request.addParameter('z4',TYPES.TinyInt,imgObj['zoom_coords'][3])
+	request.addParameter('cube_id',TYPES.Int)
+	request.addParameter('lat',TYPES.Int)
+	request.addParameter('lon',TYPES.Int)
+	request.addParameter('dir',TYPES.TinyInt)
+	request.addParameter('z1',TYPES.TinyInt)
+	request.addParameter('z2',TYPES.TinyInt)
+	request.addParameter('z3',TYPES.TinyInt)
+	request.addParameter('z4',TYPES.TinyInt)
 
-	pooler.execute(function(connection){ connection.execSql(request) });
+	query(request,{
+		cube_id: imgObj['cube_id'],
+		lat: imgObj['lat'],
+		lon: imgObj['lon'],
+		dir: imgObj['direction'],
+		z1: imgObj['zoom_coords'][0],
+		z2: imgObj['zoom_coords'][1],
+		z3: imgObj['zoom_coords'][2],
+		z4: imgObj['zoom_coords'][3]
+	})
 }
 
 function addDetection(imgObj,detection,cb) {
 
-	console.log('adding detection to database')
+	// console.log('DB: adding detection to database')
 
 	var q = "INSERT INTO detections (image_id, x_min, x_max, y_min, y_max)" +
 			"OUTPUT Inserted.ID " +
 			"VALUES (@image_id,@x_min,@x_max,@y_min,@y_max);"
 	var request = new Request(q, function(err,rowCount,rows){
-		if (err) {
-			cb(err,null)
-		} else {
-			// return detectionId
-			cb(null,rows[0]['ID']['value'])
+		// console.log('DB: added')
+		if (typeof cb !== 'undefined') {
+			if (err) {
+				cb(err,null)
+			} else {
+				// return detectionId
+				cb(null,rows[0]['ID']['value'])
+			}
 		}
 	})
 
@@ -156,20 +197,29 @@ function addDetection(imgObj,detection,cb) {
 	request.addParameter('y_min',TYPES.Int,detection['y_min'])
 	request.addParameter('y_max',TYPES.Int,detection['y_max'])
 
+	var params = {
+		x_min: detection['x_min'],
+		x_max: detection['x_max'],
+		y_min: detection['y_min'],
+		y_max: detection['y_max']
+	}
+
 	// TODO: If imgObj isn't in database, add it
 	getImageId(imgObj,function(err,imgId){
 		if (err == 'NoImageError'){
 			addImage(imgObj,function(err,imgId){
 				// The image has been added to the DB. Add the detection.
-				request.addParameter('image_id',TYPES.Int,imgId)
-				pooler.execute(function(connection){ connection.execSql(request) })
+				request.addParameter('image_id',TYPES.Int)
+				params['image_id'] = imgId
+				query(request, params)
 			})
 		} else if (err) {
 			cb(err, null)
 		} else {
 			// The image is in the database. Add the detection.
-			request.addParameter('image_id',TYPES.Int,imgId)
-			pooler.execute(function(connection){ connection.execSql(request) })
+			request.addParameter('image_id',TYPES.Int)
+			params['image_id'] = imgId
+			query(request, params)
 		}
 	})
 }

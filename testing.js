@@ -28,10 +28,18 @@ var db = require('./backend/db.js')
 // 	console.log(detection)
 // })
 
+// 3 cubes
+backend.getDetections(40.0181,40.018,-105.27,-105.2705,function(detection,err){
+	console.log(detection)
+})
+
+// 40.018,-105.27
+// 40.0181,-105.2705
+
 
 // Database tests
 // Gets detections with a given img id
-// db.getDetectionsFromImgId('1',function(err,detection){
+// db.getDetectionsFromImageId('1',function(err,detection){
 // 	console.log(detection)
 // })
 
@@ -46,8 +54,8 @@ var db = require('./backend/db.js')
 // })
 
 // Adds a detection to the database
-db.addDetection({cube_id: 123, direction: 1, zoom_coords: [0,0,0,0]},
-				{x_min: 0, x_max: 0, y_min: 0, y_max: 0},
-				function(err,detectionId){
-	console.log(detectionId)
-})
+// db.addDetection({cube_id: 1234, direction: 1, zoom_coords: [0,0,0,0]},
+// 				{x_min: 0, x_max: 0, y_min: 0, y_max: 0},
+// 				function(err,detectionId){
+// 	console.log(detectionId)
+// })

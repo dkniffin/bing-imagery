@@ -91,28 +91,34 @@ exports.getDetections = function(n,s,e,w,cb) {
 
 	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
 		if (err) { return } // TODO: cb
-		imgs.forEach(function(imgObj){
-			// console.log('processing image object ')
-			db.detections(imgObj,function(detection, err){
+		async.each(imgs,function(imgObj,img_cb){
+			// console.log('processing image object '+imgObj['cube_id'])
+			// console.log('processing image '+imgURL(imgObj))
+			db.detections(imgObj,function(err, detection){
+				console.log('meh')
 				if (err == 'NoDetectionsError') {
+					// console.log('running detector for '+imgObj['cube_id'])
 					// Detection hasn't been run on this cube
 					// Run detector
 					var url = imgURL(imgObj);
-					detector.detect(url, function(detections,err){
-						detections.forEach(function(detection){
+					detector.detect(url, function(err,detections){
+						async.each(detections,function(detection, detect_cb){
 							// console.log('found detection')
 							// Add detections to the database
 							db.addDetection(imgObj,detection)
 
 							//Send results to frontend
-							cb(detection,err)
+							cb(err,detection)
+
+							detect_cb()
+							img_cb()
 						})
 					})
 				} else if (err != null) {
-					//console.error(err) // TODO: cb
+					console.error(err) // TODO: cb
 				} else {
 					// Send results to frontend
-					cb(detection,null)
+					cb(null,detection)
 				}
 			})
 		})
