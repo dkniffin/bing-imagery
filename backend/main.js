@@ -30,6 +30,8 @@ function getImageObjs(n,s,e,w,dirs,zoom,cb) {
 		objects = JSON.parse(json).slice(1)
 		var all_zoom_coords = Combinatorics.baseN([0,1,2,3],zoom).toArray()
 
+		console.log(objects.length)
+
 		imgObjs = async.concat(objects,function(obj,map_cb){
 			async.concat(dirs,function(dir,map2_cb){
 				async.concat(all_zoom_coords,function(zoom_coords,map3_cb){
@@ -90,6 +92,7 @@ exports.getDetections = function(n,s,e,w,cb) {
 	var dirs = ['LEFT','RIGHT']
 
 	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
+		console.log(imgs.length);
 		if (err) { return } // TODO: cb
 		async.each(imgs,function(imgObj,img_cb){
 			// console.log('processing image object '+imgObj['cube_id'])

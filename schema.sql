@@ -1,3 +1,7 @@
+create database bit_detections;
+create user 'bit' identified by 'qwerty';
+grant all privileges on bit_detections.* to 'bit';
+
 USE bit_detections;
 CREATE TABLE images
 (

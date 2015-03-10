@@ -1,5 +1,5 @@
 // Map = require('./map.js');
-BI = require('./backend-interface.js');
+bi = require('./backend-interface.js');
 map = require('./map.js')
 map.init();
 
@@ -7,5 +7,7 @@ map.init();
 
 document.getElementById("start").onclick = function() {
   //send stuff to the backend
-  BI(map.getNSEW());
+  bi.send(map.getNSEW(),function(detection){
+  	map.addDetection(detection)
+  });
 }

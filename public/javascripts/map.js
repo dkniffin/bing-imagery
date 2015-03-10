@@ -1,5 +1,6 @@
 var map;
 var locationFilter;
+var pruneCluster;
 
 exports.init = function() {
 	map = L.map('myMap').setView([40.018,-105.2755], 18);
@@ -14,6 +15,14 @@ exports.init = function() {
 		bounds: L.LatLngBounds([[40.018718, -105.276061],[40.017978, -105.274441]]),
 		enable: true});
 	locationFilter.addTo(map);
+
+	pruneCluster = new PruneClusterForLeaflet();
+	map.addLayer(pruneCluster);
+}
+exports.addDetection = function(detection) {
+	var marker = new PruneCluster.Marker(detection['lat'],detection['lon']);
+	pruneCluster.RegisterMarker(marker);
+	pruneCluster.ProcessView();
 }
 exports.getNSEW = function() {
 	// Read the bounding box

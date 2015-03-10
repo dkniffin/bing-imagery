@@ -7,3 +7,7 @@ exports.detect = function(url,cb) {
 	//console.log('detecting');
 	cb(err,detections);
 }
+
+// http://dev.virtualearth.net/mapcontrol/HumanScaleServices/GetBubbles.ashx?c=1&n=40.01910&s=40.01758&e=-105.27450&w=-105.27575
+//40.01758,-105.27575
+//40.01910,-105.27450
