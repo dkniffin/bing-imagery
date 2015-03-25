@@ -21,9 +21,9 @@ exports.init = function() {
 	pruneCluster = new PruneClusterForLeaflet();
 	map.addLayer(pruneCluster);
 }
-exports.addDetection = function(detection) {
-	console.log(detection);
-	var marker = new PruneCluster.Marker(detection['lat'],detection['lon']);
+exports.addMarker = function(cube_id,lat,lon) {
+	//console.log(detection);
+	var marker = new PruneCluster.Marker(lat,lon);
 	pruneCluster.RegisterMarker(marker);
 	pruneCluster.ProcessView();
 }

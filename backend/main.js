@@ -116,7 +116,7 @@ exports.getDetections = function(n,s,e,w,cb) {
 			cb(err,null)
 		} else {
 			var imgObj = {
-				cube_id: row['image_id'],
+				cube_id: row['cube_id'],
 				lat: row['lat'],
 				lon: row['lon'],
 				direction: row['direction'],
