@@ -29,10 +29,13 @@ var db = require('./backend/db.js')
 // })
 
 // 3 cubes
-backend.getDetections(40.0181,40.018,-105.27,-105.2705,function(err,detection){
-	console.log(detection)
-})
+// backend.getDetections(40.0181,40.018,-105.27,-105.2705,function(err,detection){
+// 	console.log(detection)
+// })
 
+db.detectionsInBounds(41.1,40.0,-105.0,-105.5,function(err,detection){
+	console.log(err,detection)
+})
 
 // Database tests
 // Gets detections with a given img id

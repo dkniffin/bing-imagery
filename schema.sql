@@ -7,8 +7,8 @@ CREATE TABLE images
 (
 	id int PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	cube_id int NOT NULL,
-	lat decimal,
-	lon decimal,
+	lat decimal(8,5),
+	lon decimal(8,5),
 	direction tinyint,
 	zoom_1_coord tinyint,
 	zoom_2_coord tinyint,

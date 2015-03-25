@@ -47,6 +47,32 @@ function detections(imgObj,cb) {
 	})
 }
 
+function detectionsInBounds(n,s,e,w,cb) {
+	var detections = []
+	var err = null
+
+	var q = "SELECT * FROM detections " +
+			"JOIN images " +
+			" ON images.id = detections.id " +
+			"WHERE lat < ? AND lat > ? " +
+			"AND lon < ? AND lon > ?";
+
+	q = mysql.format(q,[n,s,e,w])
+	// console.log(q)
+
+	pool.query(q, function(err, rows, fields) {
+		if(err) {
+			cb(err,null)
+		} else if (rows.length == 0) {
+			cb('NoDetectionsError',null)
+		} else {
+			rows.forEach(function(row){
+				cb(null,row)
+			})
+		}
+	})
+}
+
 function getDetectionsFromImgId(imgId,cb) {
 	var detections = []
 	var err = null
@@ -175,6 +201,7 @@ function addDetection(imgObj,detection,cb) {
 
 module.exports = exports = {
 	detections: detections,
+	detectionsInBounds: detectionsInBounds,
 	getDetectionsFromImageId: getDetectionsFromImgId,
 	getImageId: getImageId,
 	addImage: addImage,

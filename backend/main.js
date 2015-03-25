@@ -77,6 +77,23 @@ function imgURL(imgObj) {
 	return "http://ak.t1.tiles.virtualearth.net/tiles/hs" + url_param + ".jpg?g=2981&n=z"
 }
 
+function detectionObj(imgObj,row,url) {
+	if (url == null) {
+		url = imgURL(imgObj)
+	}
+	return {
+			url: url,
+			cube_id: imgObj['cube_id'],
+			lat: imgObj['lat'],
+			lon: imgObj['lon'],
+			detect_coords: {
+				x_min: row['x_min'],
+				x_max: row['x_max'],
+				y_min: row['y_min'],
+				y_max: row['y_max']
+			}
+	}
+}
 
 function imgURLs(id,dirs,zoom,cb) {
 	dirs.forEach(function(dir){
@@ -91,46 +108,53 @@ exports.getDetections = function(n,s,e,w,cb) {
 	var zoom = 3
 	var dirs = ['LEFT','RIGHT']
 
+	db.detectionsInBounds(n,s,e,w,function(err,row){
+		if (err == 'NoDetectionsError') {
+			// Do nothing.
+		} else if (err != null) {
+			console.log(err)
+			cb(err,null)
+		} else {
+			var imgObj = {
+				cube_id: row['image_id'],
+				lat: row['lat'],
+				lon: row['lon'],
+				direction: row['direction'],
+				zoom_coords: [
+					row['zoom_1_coord'],
+					row['zoom_2_coord'],
+					row['zoom_3_coord'],
+					row['zoom_4_coord']
+			]};
+			cb(err,detectionObj(imgObj,row))
+		}
+	})
+
 	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
-		console.log(imgs.length);
-		if (err) { return } // TODO: cb
+		if (err) { cb(err,null) }
 		async.each(imgs,function(imgObj,img_cb){
-			// console.log('processing image object '+imgObj['cube_id'])
-			// console.log('processing image '+imgURL(imgObj))
 			db.detections(imgObj,function(err, detection){
 				var url = imgURL(imgObj);
 				if (err == 'NoDetectionsError') {
-					// console.log('running detector for '+imgObj['cube_id'])
 					// Detection hasn't been run on this cube
 					// Run detector
 					detector.detect(url, function(err,detections){
 						async.each(detections,function(detection, detect_cb){
-							// console.log('found detection')
 							// Add detections to the database
 							db.addDetection(imgObj,detection)
 
 							//Send results to frontend
-							cb(err,{
-								url: url,
-								lat: imgObj['lat'],
-								lon: imgObj['lon'],
-								detect_coords: detection
-							})
+							cb(err,detectionObj(imgObj,detection,url))
 
 							detect_cb()
 							img_cb()
 						})
 					})
 				} else if (err != null) {
-					console.error(err) // TODO: cb
+					cb(err,null)
 				} else {
 					// Send results to frontend
-					cb(null,{
-						url: url,
-						lat: imgObj['lat'],
-						lon: imgObj['lon'],
-						detect_coords: detection
-					})
+					// cb(null,detectionObj(imgObj,detection,url))
 				}
 			})
 		})
