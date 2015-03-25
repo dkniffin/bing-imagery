@@ -2,7 +2,7 @@ Usage
 =====
 - Install node
 - `npm install` - installs dependencies
-- `node app.js` - starts the application
+- `sudo node app.js` - starts the application
 - go to http://localhost
 
 Dev
