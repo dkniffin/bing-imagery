@@ -26,6 +26,7 @@ exports.addMarker = function(cube_id,lat,lon) {
 	var marker = new PruneCluster.Marker(lat,lon);
 	pruneCluster.RegisterMarker(marker);
 	pruneCluster.ProcessView();
+	return marker;
 }
 exports.getNSEW = function() {
 	// Read the bounding box

@@ -53,7 +53,7 @@ function detectionsInBounds(n,s,e,w,cb) {
 
 	var q = "SELECT * FROM detections " +
 			"JOIN images " +
-			" ON images.id = detections.id " +
+			" ON images.id = detections.image_id " +
 			"WHERE lat < ? AND lat > ? " +
 			"AND lon < ? AND lon > ?";
 
