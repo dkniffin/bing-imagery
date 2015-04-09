@@ -18,6 +18,20 @@
 	height: 100%;
 }
 
+.modal {
+	display: none;
+}
+
+.modal > img {
+	width: 128px;
+	height: 128px;
+}
+
+.popupImage {
+	float: left;
+	margin: 2px;
+}
+
 /* Sidebar */
 button {
 	border-radius: 10px;
