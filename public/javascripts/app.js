@@ -8,55 +8,40 @@ function getQuadrant(num, rows, cols, pos) {
 
   var row = Math.floor(num / rows);
   var col = num % cols;
-  var quad;
 
   subRows = rows/2;
   subCols = cols/2;
 
-  if (row < subRows) {
-    if (col < subCols) quad = 0;
-    else quad = 1;
-  }
-  else {
-    if (col < subCols) quad = 2;
-    else quad = 3;
-  }
-
-  if (quad == 0) {
-    num = (col) + (subRows * row);
-  }
-  else if (quad == 1) {
-    num = (col - subCols) + (subRows * row);
-  }
-  else if (quad == 2) {
-    num = (col) + (subRows * (row - subRows));
-  }
-  else if (quad == 3) {
-    num = (col - subCols) + (subRows * (row - subRows));
-  }
+  var quad = (col < subCols ? 0 : 1) + (row < subRows ? 0 : 2);
+  num = col - (col >= subCols ? subCols : 0) + subRows * (row % subRows);
 
   return getQuadrant(num, subRows, subCols, pos += quad.toString());
 }
 
-function getPosition(num) {
-  return getQuadrant(num, 8, 8, '');
-}
-
 function createModal(id) {
+  var row;
   var modal = document.createElement('div');
   modal.id = id;
   modal.className = 'modal';
 
   for (var j = 0; j < 64; j++) {
+    if (j % 8 === 0) {
+      row = document.createElement('div'); 
+      row.className = 'modalRow'
+      modal.appendChild(row);
+    }
+
     var modalImg = document.createElement('img');
-    modalImg.src = "http://ecn.t1.tiles.virtualearth.net/tiles/hs0" + id + getPosition(j) +".jpg?g=2981&n=z"
-    modal.appendChild(modalImg);
+    modalImg.src = "http://ecn.t1.tiles.virtualearth.net/tiles/hs0" + id + getQuadrant(j, 8, 8, '') +".jpg?g=2981&n=z"
+    row.appendChild(modalImg);
   }
 
   document.body.insertBefore(modal, document.body.childNodes[0]);
-  $('#' + id).easyModal({top: 75});
+  $('#' + id).easyModal({
+    left: parseInt($('#main').css('left')),
+    top: 0
+  });
   $('#' + id).trigger('openModal');
-
 }
 
 
@@ -105,6 +90,9 @@ document.getElementById("start").onclick = function() {
             var id = base4_id_string + direction;
             if (!document.getElementById(id)) {
               createModal(id);
+            }
+            else {
+              $('#'+id).trigger('openModal');
             }
           }
 
