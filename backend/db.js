@@ -26,7 +26,7 @@ async.objectMap = function ( obj, func, cb ) {
 	});
 }
 
-function detections(imgObj,cb) {
+function detections(imgObj,type,cb) {
 	// cb -> function(detections,err)
 	// console.log('DB: getting db detections')
 	getImageId(imgObj,function(err,imgId){
@@ -42,12 +42,12 @@ function detections(imgObj,cb) {
 		} else if (err) {
 			cb(err,null)
 		} else {
-			getDetectionsFromImgId(imgId,cb)
+			getDetectionsFromImgId(imgId,type,cb)
 		}
 	})
 }
 
-function detectionsInBounds(n,s,e,w,cb) {
+function detectionsInBounds(n,s,e,w,type,cb) {
 	var detections = []
 	var err = null
 
@@ -55,9 +55,10 @@ function detectionsInBounds(n,s,e,w,cb) {
 			"JOIN images " +
 			" ON images.id = detections.image_id " +
 			"WHERE lat < ? AND lat > ? " +
-			"AND lon < ? AND lon > ?";
+			"AND lon < ? AND lon > ? " +
+			"AND detection_type = ?";
 
-	q = mysql.format(q,[n,s,e,w])
+	q = mysql.format(q,[n,s,e,w,type])
 	// console.log(q)
 
 	pool.query(q, function(err, rows, fields) {
@@ -78,9 +79,10 @@ function getDetectionsFromImgId(imgId,cb) {
 	var err = null
 
 	var q = "SELECT * FROM detections " +
-			"WHERE image_id = ?";
+			"WHERE image_id = ? " +
+			"AND type = ?";
 
-	q = mysql.format(q,[imgId])
+	q = mysql.format(q,[imgId,type])
 
 	pool.query(q, function(err, rows, fields) {
 		if (err) {
@@ -151,12 +153,12 @@ function addImage(imgObj, cb) {
 	});
 }
 
-function addDetection(imgObj,detection,cb) {
+function addDetection(imgObj,detection,type,cb) {
 
 	// console.log('DB: adding detection to database')
 
-	var q = "INSERT INTO detections (x_min, x_max, y_min, y_max, image_id) " +
-			"VALUES (?,?,?,?,?);"
+	var q = "INSERT INTO detections (x_min, x_max, y_min, y_max,detection_type,image_id) " +
+			"VALUES (?,?,?,?,?,?);"
 
 	// console.log('DB: added')
 
@@ -164,7 +166,8 @@ function addDetection(imgObj,detection,cb) {
 		detection['x_min'],
 		detection['x_max'],
 		detection['y_min'],
-		detection['y_max']
+		detection['y_max'],
+		type
 	];
 
 	function query(q,p){

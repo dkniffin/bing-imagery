@@ -65,8 +65,13 @@ document.getElementById("start").onclick = function() {
   // Object for storing detections
   // Should map cube_id to arrays of detections
   var detections = {}
+
+  var type = 'faces';
+
+  var data = map.getNSEW();
+  data['type'] = type;
   //send stuff to the backend
-  bi.send(map.getNSEW(),function(detection){
+  bi.send(data,function(detection){
     var base4_id_string = detection.cube_id.toString(4);
 
   	if (detections[detection.cube_id] == null) {

@@ -77,7 +77,7 @@ function imgURL(imgObj) {
 	return "http://ak.t1.tiles.virtualearth.net/tiles/hs" + url_param + ".jpg?g=2981&n=z"
 }
 
-function detectionObj(imgObj,row,url) {
+function detectionObj(imgObj,row,det_type,url) {
 	if (url == null) {
 		url = imgURL(imgObj)
 	}
@@ -86,6 +86,7 @@ function detectionObj(imgObj,row,url) {
 			cube_id: imgObj['cube_id'],
 			lat: imgObj['lat'],
 			lon: imgObj['lon'],
+			detection_type: det_type,
 			detect_coords: {
 				x_min: row['x_min'],
 				x_max: row['x_max'],
@@ -104,11 +105,12 @@ function imgURLs(id,dirs,zoom,cb) {
 	})
 }
 
-exports.getDetections = function(n,s,e,w,cb) {
+exports.getDetections = function(n,s,e,w,type,cb) {
+	console.log(type)
 	var zoom = 3
 	var dirs = ['LEFT','RIGHT']
 
-	db.detectionsInBounds(n,s,e,w,function(err,row){
+	db.detectionsInBounds(n,s,e,w,type,function(err,row){
 		if (err == 'NoDetectionsError') {
 			// Do nothing.
 		} else if (err != null) {
@@ -126,25 +128,25 @@ exports.getDetections = function(n,s,e,w,cb) {
 					row['zoom_3_coord'],
 					row['zoom_4_coord']
 			]};
-			cb(err,detectionObj(imgObj,row))
+			cb(err,detectionObj(imgObj,row,type))
 		}
 	})
 
 	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
 		if (err) { cb(err,null) }
 		async.each(imgs,function(imgObj,img_cb){
-			db.detections(imgObj,function(err, detection){
+			db.detections(imgObj,type,function(err, detection){
 				var url = imgURL(imgObj);
 				if (err == 'NoDetectionsError') {
 					// Detection hasn't been run on this cube
 					// Run detector
-					detector.detect(url, function(err,detections){
+					detector.detect(url,type,function(err,detections){
 						async.each(detections,function(detection, detect_cb){
 							// Add detections to the database
-							db.addDetection(imgObj,detection)
+							db.addDetection(imgObj,detection,type)
 
 							//Send results to frontend
-							cb(err,detectionObj(imgObj,detection,url))
+							cb(err,detectionObj(imgObj,detection,type,url))
 
 							detect_cb()
 							img_cb()
@@ -154,7 +156,7 @@ exports.getDetections = function(n,s,e,w,cb) {
 					cb(err,null)
 				} else {
 					// Send results to frontend
-					// cb(null,detectionObj(imgObj,detection,url))
+					// cb(null,detectionObj(imgObj,detection,type,url))
 				}
 			})
 		})

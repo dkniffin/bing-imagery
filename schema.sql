@@ -21,6 +21,7 @@ ON images (cube_id);
 CREATE TABLE detections (
 	id int PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	image_id int NOT NULL,
+	detection_type varchar(50) NOT NULL,
 	x_min int,
 	x_max int,
 	y_min int,

@@ -1,4 +1,4 @@
-exports.detect = function(url,cb) {
+exports.detect = function(url,type,cb) {
 	var detections = []
 	var err = null
 	// TODO: Find detections
