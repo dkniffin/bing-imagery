@@ -22,7 +22,12 @@
 	display: none;
 }
 
-.modal > img {
+.modalRow {
+	width: 1024px;
+	height: 128px;
+}
+
+.modalRow > img {
 	width: 128px;
 	height: 128px;
 }
