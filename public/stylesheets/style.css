@@ -25,7 +25,7 @@ button {
 }
 #start {
 	height: 50px;
-	width: 200px;
+	width: 200px;`
 	margin: 20px;
 	background: #2C6700;
 	color: #FFF;
@@ -38,6 +38,11 @@ button {
 	display: inline-block;
 	margin-top: 5px;
 	margin-bottom: 5px;
+}
+
+/* locationfilter hack */
+.button-container {
+	display: none;
 }
 
 /* Popups */
