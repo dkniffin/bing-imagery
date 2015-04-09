@@ -19,7 +19,22 @@ document.getElementById("start").onclick = function() {
 			marker.bindPopup(function() {
         var content = '<div class="img_popup">'
         detections[detection.cube_id].forEach(function(d){
-          content += '<img src=' + d.url + '/>';
+          var w = d.detect_coords.x_max - d.detect_coords.x_min;
+          // var w = 50;
+          var h = d.detect_coords.y_max - d.detect_coords.y_min;
+          var top = d.detect_coords.y_min;
+          var left = d.detect_coords.x_min;
+
+          var end_w = 50; // Size of the displayed detection
+          var scale = end_w/w; // How much to scale the image by to get the proper end-size
+
+          var inline_css = 'width: ' + w * scale + ';';
+          inline_css += 'height: ' + h * scale + ';';
+          inline_css += 'background: url(' + d.url + ') ' + left + ' ' + top + ';'
+          inline_css += 'background-size: ' + 256 * scale + 'px;'
+          inline_css += 'float: left;';
+          inline_css += 'margin: 2px;'
+          content += '<div style="' + inline_css + '"></div>';
         });
 
         content += '</div>'
