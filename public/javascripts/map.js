@@ -1,6 +1,6 @@
 var map;
 var locationFilter;
-var pruneCluster;
+var markers;
 
 exports.init = function() {
 	map = L.map('myMap',{maxZoom: 22}).setView([40.018,-105.2755], 18);
@@ -12,20 +12,20 @@ exports.init = function() {
 	map.addLayer(bing);
 	map.addControl(new L.Control.Layers({'OSM':osm, "Bing":bing}, {}));
 
+	markers = new L.MarkerClusterGroup();
+	map.addLayer(markers);
+
 	// Add a bounding box selector to the map
 	locationFilter = new L.LocationFilter({
 		bounds: L.LatLngBounds([[40.018718, -105.276061],[40.017978, -105.274441]]),
 		enable: true});
 	locationFilter.addTo(map);
-
-	pruneCluster = new PruneClusterForLeaflet();
-	map.addLayer(pruneCluster);
 }
 exports.addMarker = function(cube_id,lat,lon) {
 	//console.log(detection);
-	var marker = new PruneCluster.Marker(lat,lon);
-	pruneCluster.RegisterMarker(marker);
-	pruneCluster.ProcessView();
+	var marker = L.marker(new L.LatLng(lat, lon));
+	marker.bindPopup('<h1> foo </h1>');
+	markers.addLayer(marker);
 	return marker;
 }
 exports.getNSEW = function() {

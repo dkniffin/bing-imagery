@@ -12,18 +12,20 @@ document.getElementById("start").onclick = function() {
   var detections = {}
   //send stuff to the backend
   bi.send(map.getNSEW(),function(detection){
-  	console.log(detection.url)
   	if (detections[detection.cube_id] == null) {
   		detections[detection.cube_id] = [];
   		var marker = map.addMarker(detection.cube_id,detection.lat,detection.lon)
-  		marker.data.popup = function(data,category){
-  			var content = '<div class="img_popup">'
-  			detections[detection.cube_id].forEach(function(d){
-  				content += '<img src=' + d.url + '/>';
-  			})
-  			content += '</div>';
-  			return content;
-  		};
+
+			marker.bindPopup(function() {
+        var content = '<div class="img_popup">'
+        detections[detection.cube_id].forEach(function(d){
+          content += '<img src=' + d.url + '/>';
+        });
+
+        content += '</div>'
+        return content;
+
+      });
   	}
   	detections[detection.cube_id].push(detection)
 

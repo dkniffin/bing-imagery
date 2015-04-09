@@ -36,7 +36,6 @@ app.use(function(req, res, next) {
 
 io.on('connection', function (socket) {
     socket.on('getDetection', function(data) {
-        console.log(data);
 
         backend.getDetections(data['n'],data['s'],data['e'],data['w'],function(err, data){
             socket.emit('receiveDetection', data);
