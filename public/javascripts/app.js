@@ -1,6 +1,5 @@
 // Map = require('./map.js');
-bi = require('./backend-interface.js');
-map = require('./map.js')
+
 map.init();
 
 function getQuadrant(num, rows, cols, pos) {
@@ -26,7 +25,7 @@ function createModal(id) {
 
   for (var j = 0; j < 64; j++) {
     if (j % 8 === 0) {
-      row = document.createElement('div'); 
+      row = document.createElement('div');
       row.className = 'modalRow'
       modal.appendChild(row);
     }

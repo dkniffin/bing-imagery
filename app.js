@@ -11,7 +11,7 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var backend = require('./backend/main')
 
-server.listen(80);
+server.listen(4000);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
