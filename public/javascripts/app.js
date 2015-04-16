@@ -50,7 +50,7 @@ document.getElementById("start").onclick = function() {
   // Should map cube_id to arrays of detections
   var detections = {}
 
-  var type = 'faces';
+  var type = document.getElementById('classifier').value;
 
   var data = map.getNSEW();
   data['type'] = type;
