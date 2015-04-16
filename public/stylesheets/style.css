@@ -24,12 +24,12 @@
 
 .modalRow {
 	width: 1024px;
-	height: 128px;
+	height: 12.5vh;
 }
 
-.modalRow > img {
+.modalRow > img{
 	width: 128px;
-	height: 128px;
+	height: 12.5vh;
 }
 
 .popupImage {
