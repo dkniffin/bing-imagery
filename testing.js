@@ -11,9 +11,34 @@
 // })
 
 
+var cv = require("cloudcv-backend")
+var async = require('async')
 
-var backend = require('./backend/main.js')
-var db = require('./backend/db.js')
+
+var http = require('http');
+http.get('http://images.wisegeek.com/triangular-face.jpg', function(res) {
+  var data = [];
+
+  res.on('data', function(chunk) {
+  data.push(chunk);
+  }).on('end', function() {
+  //at this point data is an array of Buffers
+  //so Buffer.concat() can make us a new Buffer
+  //of all of them together
+  var buffer = Buffer.concat(data);
+  // console.log(buffer.toString('base64'));
+  cv.detectObjects(buffer, function(error, result)
+  {
+
+      console.log(error, result);    
+  })
+
+  });
+});
+
+
+// var backend = require('./backend/main.js')
+// var db = require('./backend/db.js')
 
 // db.detections('1234',function(err,detections){
 // 	if (err == 'NoDetectionsError') {
@@ -33,9 +58,9 @@ var db = require('./backend/db.js')
 // 	console.log(detection)
 // })
 
-db.detectionsInBounds(41.1,40.0,-105.0,-105.5,function(err,detection){
-	console.log(err,detection)
-})
+// db.detectionsInBounds(41.1,40.0,-105.0,-105.5,function(err,detection){
+// 	console.log(err,detection)
+// })
 
 // Database tests
 // Gets detections with a given img id

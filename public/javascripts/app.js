@@ -56,6 +56,7 @@ document.getElementById("start").onclick = function() {
   data['type'] = type;
   //send stuff to the backend
   bi.send(data,function(detection){
+    console.log(detection);
     var base4_id_string = detection.cube_id.toString(4);
 
   	if (detections[detection.cube_id] == null) {

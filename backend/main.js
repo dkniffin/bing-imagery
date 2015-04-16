@@ -128,13 +128,13 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 					row['zoom_3_coord'],
 					row['zoom_4_coord']
 			]};
-			cb(err,detectionObj(imgObj,row,type))
+			// cb(err,detectionObj(imgObj,row,type))
 		}
 	})
 
 	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
 		if (err) { cb(err,null) }
-		async.each(imgs,function(imgObj,img_cb){
+		async.eachLimit(imgs, 1, function(imgObj,img_cb){
 			db.detections(imgObj,type,function(err, detection){
 				var url = imgURL(imgObj);
 				if (err == 'NoDetectionsError') {
