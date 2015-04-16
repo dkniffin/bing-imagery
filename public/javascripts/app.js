@@ -17,7 +17,11 @@ function getQuadrant(num, rows, cols, pos) {
   return getQuadrant(num, subRows, subCols, pos += quad.toString());
 }
 
-function createModal(id) {
+function agnosticUrl(url) {
+  return url.slice(url.indexOf('hs') + 2);
+}
+
+function createModal(id, detections) {
   var row;
   var modal = document.createElement('div');
   modal.id = id;
@@ -30,9 +34,35 @@ function createModal(id) {
       modal.appendChild(row);
     }
 
-    var modalImg = document.createElement('img');
-    modalImg.src = "http://ecn.t1.tiles.virtualearth.net/tiles/hs0" + id + getQuadrant(j, 8, 8, '') +".jpg?g=2981&n=z"
-    row.appendChild(modalImg);
+    var url = "http://ecn.t1.tiles.virtualearth.net/tiles/hs0" + id + getQuadrant(j, 8, 8, '') +".jpg?g=2981&n=z";
+    var index = _(detections).pluck('url').map(agnosticUrl).indexOf(agnosticUrl(url));
+
+    if (index !== -1) {
+      var detection = detections[index];
+
+      var img = new Image;
+      var canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = parseInt(document.documentElement.clientHeight / 8);
+
+      row.appendChild(canvas);
+      var ctx = canvas.getContext('2d');
+
+      img.onload = function(img, detect_coords){
+        this.drawImage(img,0,0, 128, parseInt(document.documentElement.clientHeight / 8))
+        this.beginPath();
+        this.rect(detect_coords.x_min, detect_coords.y_min, detect_coords.x_max + 30, detect_coords.y_max + 50);
+        this.strokeStyle = 'red';
+        this.stroke();
+      }.bind(ctx, img, detection.detect_coords)
+
+      img.src = url;
+    }
+    else {
+      var modalImg = new Image;
+      modalImg.src = url;
+      row.appendChild(modalImg);
+    }
   }
 
   document.body.insertBefore(modal, document.body.childNodes[0]);
@@ -50,7 +80,7 @@ document.getElementById("start").onclick = function() {
   // Should map cube_id to arrays of detections
   var detections = {}
 
-  var type = 'faces';
+  var type = document.getElementById('classifier').value;
 
   var data = map.getNSEW();
   data['type'] = type;
@@ -94,7 +124,7 @@ document.getElementById("start").onclick = function() {
             var direction = url.slice(url.indexOf('.jpg') - 5, url.indexOf('.jpg') - 3);
             var id = base4_id_string + direction;
             if (!document.getElementById(id)) {
-              createModal(id);
+              createModal(id, detections[detection.cube_id]);
             }
             else {
               $('#'+id).trigger('openModal');
