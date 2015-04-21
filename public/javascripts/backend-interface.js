@@ -1,4 +1,4 @@
-var socket = io('http://localhost');
+var socket = io();
 
 var bi = {
 	send: function send(data,cb) {
