@@ -49,10 +49,11 @@ $('.location').each(function(i,element){
       case 'loc_times_square':
       	ne = L.latLng(40.75814979112882,-73.98533195257187)
         sw = L.latLng(40.75779627463774,-73.98581206798553);
-
+        break;
       case 'loc_bing_1cube':
       	ne = L.latLng(40.01804329142695,-105.27583345770836);
       	sw = L.latLng(40.018010425046754,-105.27586363255978);
+      	break;
     }
 
     var bounds = L.latLngBounds(ne,sw);
