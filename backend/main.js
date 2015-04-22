@@ -30,8 +30,6 @@ function getImageObjs(n,s,e,w,dirs,zoom,cb) {
 		objects = JSON.parse(json).slice(1)
 		var all_zoom_coords = Combinatorics.baseN([0,1,2,3],zoom).toArray()
 
-		console.log(objects.length)
-
 		imgObjs = async.concat(objects,function(obj,map_cb){
 			async.concat(dirs,function(dir,map2_cb){
 				async.concat(all_zoom_coords,function(zoom_coords,map3_cb){
@@ -106,7 +104,6 @@ function imgURLs(id,dirs,zoom,cb) {
 }
 
 exports.getDetections = function(n,s,e,w,type,cb) {
-	console.log(type)
 	var zoom = 3
 	var dirs = ['LEFT','RIGHT']
 

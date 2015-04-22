@@ -11,25 +11,25 @@ http.get(url, function(res) {
   var data = [];
 
   res.on('data', function(chunk) {
-  data.push(chunk);
+    data.push(chunk);
   }).on('end', function() {
   //at this point data is an array of Buffers
   //so Buffer.concat() can make us a new Buffer
   //of all of them together
   var buffer = Buffer.concat(data);
-  // console.log(buffer.toString('base64'));
+   console.log(buffer.toString('base64'));
   cv.detectObjects(buffer, function(error, result)
   {
-    async.map(result,function(item,cb){
+    async.map(result,function(item,map_cb){
      var o = {
       x_min: item.x,
       x_max: item.x + item.width,
       y_min: item.y,
       y_max: item.y+ item.height
      }
-     cb(null,o)
+     map_cb(null,o)
     },function(e,detections){
-      console.log(detections);
+      //console.log(detections);
       cb(e, detections);
     })
     
@@ -37,6 +37,9 @@ http.get(url, function(res) {
 
   });
 });
+
+//detections.push({x_min:0,y_min:0,x_max:10,y_max:10});
+//cb(null,detections);
 
 }
 

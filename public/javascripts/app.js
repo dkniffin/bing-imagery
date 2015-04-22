@@ -34,7 +34,7 @@ function createModal(id, detections) {
       modal.appendChild(row);
     }
 
-    var url = "http://ecn.t1.tiles.virtualearth.net/tiles/hs0" + id + getQuadrant(j, 8, 8, '') +".jpg?g=2981&n=z";
+    var url = "http://ecn.t1.tiles.virtualearth.net/tiles/hs" + id + getQuadrant(j, 8, 8, '') +".jpg?g=2981&n=z";
     var index = _(detections).pluck('url').map(agnosticUrl).indexOf(agnosticUrl(url));
 
     if (index !== -1) {
@@ -51,7 +51,7 @@ function createModal(id, detections) {
       img.onload = function(img, detect_coords){
         this.drawImage(img,0,0, 128, parseInt(document.documentElement.clientHeight / 8))
         this.beginPath();
-        this.rect(detect_coords.x_min, detect_coords.y_min, detect_coords.x_max + 30, detect_coords.y_max + 50);
+        this.rect(detect_coords.x_min, detect_coords.y_min, detect_coords.x_max, detect_coords.y_max);
         this.strokeStyle = 'red';
         this.stroke();
       }.bind(ctx, img, detection.detect_coords)
@@ -73,6 +73,17 @@ function createModal(id, detections) {
   $('#' + id).trigger('openModal');
 }
 
+function base4(dec) {
+  return Number(dec).toString(4);
+}
+
+function pad(num, size) {
+   var s = num+"";
+   while (s.length < size) s = "0" + s;
+   return s;
+}
+
+
 
 document.getElementById("start").onclick = function() {
 
@@ -87,7 +98,7 @@ document.getElementById("start").onclick = function() {
   //send stuff to the backend
   bi.send(data,function(detection){
     console.log(detection);
-    var base4_id_string = detection.cube_id.toString(4);
+    var base4_id_string = pad(base4(detection.cube_id),16);
 
   	if (detections[detection.cube_id] == null) {
   		detections[detection.cube_id] = [];
@@ -105,9 +116,9 @@ document.getElementById("start").onclick = function() {
           var end_w = 50; // Size of the displayed detection
           var scale = end_w/w; // How much to scale the image by to get the proper end-size
 
-          var inline_css = 'width: ' + w * scale + ';';
-          inline_css += 'height: ' + h * scale + ';';
-          inline_css += 'background: url(' + d.url + ') ' + left + ' ' + top + ';'
+          var inline_css = 'width: ' + end_w + ';';
+          inline_css += 'height: ' + end_w + ';';
+          inline_css += 'background: url(' + d.url + ') ' + (left * -scale) + 'px ' + (top * -scale) + 'px;'
           inline_css += 'background-size: ' + 256 * scale + 'px;'
           content += '<div class="popupImage" style="' + inline_css + '"></div>';
         });
