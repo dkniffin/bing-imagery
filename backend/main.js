@@ -104,6 +104,8 @@ function imgURLs(id,dirs,zoom,cb) {
 }
 
 exports.getDetections = function(n,s,e,w,type,cb) {
+	// console.log("ne = L.latLng("+ n + "," + e + ");");
+	// console.log("sw = L.latLng("+ s + "," + w + ");");
 	var zoom = 3
 	var dirs = ['LEFT','RIGHT']
 
