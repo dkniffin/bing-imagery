@@ -131,13 +131,14 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 
 	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
 		if (err) { cb(err,null) }
-		async.eachLimit(imgs, 1, function(imgObj,img_cb){
+		async.eachLimit(imgs, 1, function(imgObj,each_cb){
 			db.detections(imgObj,type,function(err, detection){
 				var url = imgURL(imgObj);
 				if (err == 'NoDetectionsError') {
 					// Detection hasn't been run on this cube
 					// Run detector
 					detector.detect(url,type,function(err,detections){
+						each_cb()
 						async.each(detections,function(detection, detect_cb){
 							// Add detections to the database
 							db.addDetection(imgObj,detection,type)
@@ -146,7 +147,6 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 							cb(err,detectionObj(imgObj,detection,type,url))
 
 							detect_cb()
-							img_cb()
 						})
 					})
 				} else if (err != null) {
