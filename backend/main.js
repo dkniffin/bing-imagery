@@ -125,7 +125,7 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 					row['zoom_3_coord'],
 					row['zoom_4_coord']
 			]};
-			// cb(err,detectionObj(imgObj,row,type))
+			cb(err,detectionObj(imgObj,row,type))
 		}
 	})
 
@@ -153,7 +153,7 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 					cb(err,null)
 				} else {
 					// Send results to frontend
-					// cb(null,detectionObj(imgObj,detection,type,url))
+					cb(null,detectionObj(imgObj,detection,type,url))
 				}
 			})
 		})

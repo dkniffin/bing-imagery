@@ -30,7 +30,7 @@ http.get('http://images.wisegeek.com/triangular-face.jpg', function(res) {
   cv.detectObjects(buffer, function(error, result)
   {
 
-      console.log(error, result);    
+      console.log(error, result);
   })
 
   });

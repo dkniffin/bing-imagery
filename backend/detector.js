@@ -4,10 +4,18 @@ var http = require('http')
 var async = require('async')
 
 exports.detect = function(url,type,cb) {
+
+  var type_cascade_map = {
+    'faces'         : 'haarcascade_frontalface_alt.xml',
+    'license'       : 'haarcascade_russian_plate_number.xml',
+    'housenumbers'  : 'housenumbers.xml',
+    'car_side'      : 'hogcascade_cars_sideview.xml',
+    'car_frontback' : 'lbpcascade_cars_frontbackview.xml',
+    'full_body'     : 'haarcascade_fullbody.xml'
+  }
+
 	var detections = []
 	var err = null
-
-  // console.log('detecting for ' + url)
 
   http.get(url, function(res) {
     var data = [];
@@ -15,31 +23,13 @@ exports.detect = function(url,type,cb) {
     res.on('data', function(chunk) {
       data.push(chunk);
     }).on('end', function() {
-      //at this point data is an array of Buffers
-      //so Buffer.concat() can make us a new Buffer
-      //of all of them together
+      // At this point data is an array of Buffers so Buffer.concat() can make
+      // us a new Buffer of all of them together
       var buffer = Buffer.concat(data);
-       // console.log(buffer.toString('base64'));
-     //  cv.detectObjects(buffer, function(error, result)
-     //  {
-     //    async.map(result,function(item,map_cb){
-     //     var o = {
-     //      x_min: item.x,
-     //      x_max: item.x + item.width,
-     //      y_min: item.y,
-     //      y_max: item.y+ item.height
-     //     }
-     //     map_cb(null,o)
-     //    },function(e,detections){
-     //      //console.log(detections);
-     //      cb(e, detections);
-     //    })
-
-     // })
-    console.log('detecting for ' + url)
+      console.log('Finding detections for ' + url)
 
       opencv.readImage(buffer, function(err, im){
-        im.detectObject("./cascades/hogcascade_cars_sideview.xml", {}, function(err, detections){
+        im.detectObject(type_cascade_map[type], {}, function(err, detections){
           console.log(detections)
           // console.log(cascade)
           async.map(detections,function(item,map_cb){
@@ -51,7 +41,6 @@ exports.detect = function(url,type,cb) {
             }
             map_cb(null,o)
           },function(e,detections){
-          //console.log(detections);
             cb(e, detections);
           })
         });
