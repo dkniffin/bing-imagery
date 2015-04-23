@@ -3,9 +3,11 @@ var Combinatorics = require('js-combinatorics').Combinatorics
 , qs = require('querystring')
 , _ = require('underscore')
 , async = require('async')
+, path = require ('path')
+, cluster = require('cluster')
 
 , db = require('./db.js')
-, detector = require('./detector.js')
+// , detector = require('./detector.js')
 
 var DIR_MAP = { "FRONT": 1, "RIGHT": 2, "BACK": 3, "LEFT": 4, "UP": 5, "DOWN": 6 };
 
@@ -133,14 +135,22 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 
 	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
 		if (err) { cb(err,null) }
-		async.eachLimit(imgs, 1, function(imgObj,each_cb){
+		async.each(imgs, function(imgObj,each_cb){
 			db.detections(imgObj,type,function(err, detection){
 				var url = imgURL(imgObj);
 				if (err == 'NoDetectionsError') {
 					// Detection hasn't been run on this cube
 					// Run detector
-					detector.detect(url,type,function(err,detections){
-						each_cb()
+
+					console.log("in main",url)
+					cluster.setupMaster({
+						exec: path.join(__dirname, 'detector.js')
+					})
+
+					var worker = cluster.fork({url:url,type:type});
+					worker.on('message',function(msg){
+						var detections = msg.detections;
+
 						async.each(detections,function(detection, detect_cb){
 							// Add detections to the database
 							db.addDetection(imgObj,detection,type)
@@ -151,11 +161,10 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 							detect_cb()
 						})
 					})
-				} else if (err != null) {
-					cb(err,null)
+					each_cb()
 				} else {
-					// Send results to frontend
-					cb(null,detectionObj(imgObj,detection,type,url))
+					each_cb()
+					cb(err,null)
 				}
 			})
 		})
