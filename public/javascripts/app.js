@@ -49,9 +49,12 @@ function createModal(id, detections) {
       var ctx = canvas.getContext('2d');
 
       img.onload = function(img, detect_coords){
-        this.drawImage(img,0,0, 128, parseInt(document.documentElement.clientHeight / 8))
+        var height = parseInt(document.documentElement.clientHeight / 8);
+        var hScale = height / 256;
+        this.drawImage(img, 0, 0, 128, height)
         this.beginPath();
-        this.rect(detect_coords.x_min, detect_coords.y_min, detect_coords.x_max, detect_coords.y_max);
+        this.rect(detect_coords.x_min / 2, detect_coords.y_min * hScale,
+         (detect_coords.x_max - detect_coords.x_min) / 2, (detect_coords.y_max - detect_coords.y_min) * hScale);
         this.strokeStyle = 'red';
         this.stroke();
       }.bind(ctx, img, detection.detect_coords)
