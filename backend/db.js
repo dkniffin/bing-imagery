@@ -30,7 +30,7 @@ function detections(imgObj,type,cb) {
 	// cb -> function(detections,err)
 	// console.log('DB: getting db detections')
 	getImageId(imgObj,function(err,imgId){
-		console.log('DB: image id ' + err + ' ' + imgId)
+		// console.log('DB: image id ' + err + ' ' + imgId)
 		if (err == 'NoImageError') {
 			addImage(imgObj,function(err,result){
 				if (err != null) {
@@ -43,7 +43,7 @@ function detections(imgObj,type,cb) {
 			cb(err,null)
 		} else {
 			getDetectorRuns(imgId,type,function(err,id){
-				console.log("DB: img id " + imgId + " detector runs: " + err + ' ' + id)
+				// console.log("DB: img id " + imgId + " detector runs: " + err + ' ' + id)
 				if (err != null) {
 					cb(err,null)
 				} else {

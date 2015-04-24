@@ -37,8 +37,17 @@ app.use(function(req, res, next) {
 io.on('connection', function (socket) {
     socket.on('getDetection', function(data) {
 
-        backend.getDetections(data['n'],data['s'],data['e'],data['w'],data['type'],function(err, data){
-            socket.emit('receiveDetection', data);
-        })
+        backend.getDetections(
+        	data['n'],data['s'],data['e'],data['w'],
+        	data['type'],
+        	function(err, data){
+        		if (err) {
+        			console.log("ERROR: " + err);
+        		} else {
+        			socket.emit('receiveDetection', data);
+        		}
+        	}, // Found detections cb
+        	function(count){ socket.emit('imageCount', count); }, // Total count cb
+        	function(){ socket.emit('imageDone'); }) // Finished an image cb
     });
 });

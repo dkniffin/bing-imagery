@@ -105,7 +105,13 @@ function imgURLs(id,dirs,zoom,cb) {
 	})
 }
 
-exports.getDetections = function(n,s,e,w,type,cb) {
+// Input:
+//  n,s,e,w  - lat/lon coord set
+//  type     - detection type (faces, housnumbers, etc)
+//  d_cb     - callback for detections
+//  count_cb - callback to return number of images to be processed
+//  fin_cb   - callback for finished image
+exports.getDetections = function(n,s,e,w,type,d_cb,count_cb,fin_cb) {
 	// console.log("ne = L.latLng("+ n + "," + e + ");");
 	// console.log("sw = L.latLng("+ s + "," + w + ");");
 	var zoom = 3
@@ -116,7 +122,7 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 			// Do nothing.
 		} else if (err != null) {
 			console.log(err)
-			cb(err,null)
+			d_cb(err,null)
 		} else {
 			var imgObj = {
 				cube_id: row['cube_id'],
@@ -129,12 +135,14 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 					row['zoom_3_coord'],
 					row['zoom_4_coord']
 			]};
-			cb(err,detectionObj(imgObj,row,type))
+			d_cb(err,detectionObj(imgObj,row,type))
 		}
 	})
 
 	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
-		if (err) { cb(err,null) }
+		count_cb(imgs.length); // Return the number of images to be processed
+
+		if (err) { d_cb(err,null) }
 		async.eachLimit(imgs, 5, function(imgObj,each_cb){
 			db.detections(imgObj,type,function(err, detection){
 				var url = imgURL(imgObj);
@@ -151,22 +159,26 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 					worker.on('message',function(msg){
 						var detections = msg.detections;
 
+						fin_cb() // Finished processing an image
+
 						db.detectorRan(imgObj,type);
 
 						async.each(detections,function(detection, detect_cb){
 							// Add detections to the database
 							db.addDetection(imgObj,detection,type)
 
-							//Send results to frontend
-							cb(err,detectionObj(imgObj,detection,type,url))
+							// Send results to frontend
+							d_cb(null,detectionObj(imgObj,detection,type,url))
+
 
 							detect_cb()
 						})
 					})
 					each_cb()
 				} else {
+					if (err) { d_cb(err,null)}
+					fin_cb() // Finished "processing" an image
 					each_cb()
-					cb(err,null)
 				}
 			})
 		})

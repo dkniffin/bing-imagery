@@ -153,5 +153,9 @@ document.getElementById("start").onclick = function() {
   	detections[detection.cube_id].push(detection)
 
 
+  },function(count){
+    console.log('Processing ' + count + ' images.');
+  },function(){
+    console.log('Finished processing an image');
   });
 }
