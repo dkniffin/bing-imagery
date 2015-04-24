@@ -135,14 +135,14 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 
 	getImageObjs(n,s,e,w,dirs,zoom,function(err, imgs){
 		if (err) { cb(err,null) }
-		async.each(imgs, function(imgObj,each_cb){
+		async.eachLimit(imgs, 5, function(imgObj,each_cb){
 			db.detections(imgObj,type,function(err, detection){
 				var url = imgURL(imgObj);
 				if (err == 'NoDetectionsError') {
 					// Detection hasn't been run on this cube
 					// Run detector
 
-					console.log("in main",url)
+					// console.log("in main",url)
 					cluster.setupMaster({
 						exec: path.join(__dirname, 'detector.js')
 					})

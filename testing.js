@@ -11,94 +11,20 @@
 // })
 
 
-var cv = require("opencv")
-var async = require('async')
-
-
-var http = require('http');
-
-var images = [
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010000.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010010.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010200.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010100.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010220.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010320.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010110.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010300.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010310.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010030.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010020.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010130.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010001.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010230.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010120.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010101.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010330.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010210.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010301.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010201.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010021.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010211.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010121.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010221.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010111.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010131.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010311.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203010321.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001000.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001010.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001200.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001100.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001220.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001320.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001110.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001300.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001310.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001030.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001020.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001130.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001001.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001230.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001120.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001101.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001330.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001210.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001301.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001201.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001021.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001211.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001121.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001221.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001111.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001131.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001311.jpg?g=2981&n=z',
-'http://ak.t1.tiles.virtualearth.net/tiles/hs021000333323203001321.jpg?g=2981&n=z'
-  ]
-async.eachLimit(images,3,function(url,each_cb){
-  http.get(url, function(res) {
-    var data = [];
-
-    res.on('data', function(chunk) {
-      data.push(chunk);
-    }).on('end', function() {
-      // At this point data is an array of Buffers so Buffer.concat() can make
-      // us a new Buffer of all of them together
-      var buffer = Buffer.concat(data);
-      console.log('Finding detections for ' + url)
-
-      cv.readImage(buffer, function(err, im){
-        im.detectObject(cv.FACE_CASCADE, {}, function(error, result) {
-            console.log(error, result);
-            each_cb();
-        })
-      })
-    })
-  })
-})
-
+// var cv = require("opencv")
+// var async = require('async')
+// var http = require('http');
 // var backend = require('./backend/main.js')
 // var db = require('./backend/db.js')
+var detector = require('./backend/detector.js')
+
+
+
+
+
+
+////////////////// DB TESTS //////////////////
+
 
 // db.detections('1234',function(err,detections){
 // 	if (err == 'NoDetectionsError') {
@@ -144,8 +70,9 @@ async.eachLimit(images,3,function(url,each_cb){
 // })
 
 // Adds a detection to the database
-// db.addDetection({cube_id: 1234, direction: 1, zoom_coords: [0,0,0,0]},
+// db.addDetection({cube_id: 605027214, direction: 2, zoom_coords: [3,1,0]},
 // 				{x_min: 0, x_max: 0, y_min: 0, y_max: 0},
+//         'faces',
 // 				function(err,detectionId){
 // 	console.log(detectionId)
 // })

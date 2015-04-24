@@ -7,7 +7,7 @@ var async = require('async')
 var url = process.env.url
 var type = process.env.type
 
-console.log("in worker",url)
+// console.log("in worker",url)
 
 var type_cascade_map = {
   'faces'         : 'haarcascade_frontalface_alt.xml',
@@ -21,36 +21,49 @@ var type_cascade_map = {
 var detections = []
 var err = null
 
-http.get(url, function(res) {
-  var data = [];
 
-  res.on('data', function(chunk) {
-    data.push(chunk);
-  }).on('end', function() {
-    // At this point data is an array of Buffers so Buffer.concat() can make
-    // us a new Buffer of all of them together
-    var buffer = Buffer.concat(data);
-    // console.log('Finding detections for ' + url)
+function getBuffer(url,cb) {
+  http.get(url, function(res) {
+    var data = [];
 
-    opencv.readImage(buffer, function(err, im){
-      im.detectObject(type_cascade_map[type], {}, function(err, detections){
-        // console.log(detections)
-        // console.log(cascade)
-        async.map(detections,function(item,map_cb){
-          var o = {
-            x_min: item.x,
-            x_max: item.x + item.width,
-            y_min: item.y,
-            y_max: item.y+ item.height
-          }
-          map_cb(null,o)
-        },function(e,detections){
-          process.send({detections: detections})
-        })
-      });
+    res.on('data', function(chunk) {
+      data.push(chunk);
+    }).on('end', function() {
+      // At this point data is an array of Buffers so Buffer.concat() can make
+      // us a new Buffer of all of them together
+      var buffer = Buffer.concat(data);
+      // console.log('Finding detections for ' + url)
+      cb(buffer)
     });
   });
-});
+}
+
+
+function opencvDetect(buffer,cb) {
+  opencv.readImage(buffer, function(err, im){
+    im.detectObject(type_cascade_map[type], {}, cb);
+  });
+}
+
+console.log('running detector on ' + url)
+getBuffer(url,function(buffer){
+  opencvDetect(buffer,function(err, detections){
+    // console.log(detections)
+    // console.log(cascade)
+    async.map(detections,function(item,map_cb){
+      var o = {
+        x_min: item.x,
+        x_max: item.x + item.width,
+        y_min: item.y,
+        y_max: item.y+ item.height
+      }
+      map_cb(null,o)
+    },function(e,detections){
+      process.send({detections: detections})
+      process.exit();
+    })
+  })
+})
 
 //detections.push({x_min:0,y_min:0,x_max:10,y_max:10});
 //cb(null,detections);

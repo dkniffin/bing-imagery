@@ -1,7 +1,7 @@
 var async = require('async')
 var mysql = require('mysql');
 var pool  = mysql.createPool({
-  connectionLimit : 10,
+  connectionLimit : 50,
   host            : 'localhost',
   user            : 'bit',
   password        : 'qwerty',
@@ -33,7 +33,7 @@ function detections(imgObj,type,cb) {
 		// console.log('DB: image id ' + err + ' ' + imgId)
 		if (err == 'NoImageError') {
 			addImage(imgObj,function(err,result){
-				if (err) {
+				if (err != null) {
 					cb(err,null)
 				} else {
 					cb('NoDetectionsError',null)
@@ -74,13 +74,13 @@ function detectionsInBounds(n,s,e,w,type,cb) {
 	})
 }
 
-function getDetectionsFromImgId(imgId,cb) {
+function getDetectionsFromImgId(imgId,type,cb) {
 	var detections = []
 	var err = null
 
 	var q = "SELECT * FROM detections " +
 			"WHERE image_id = ? " +
-			"AND type = ?";
+			"AND detection_type = ?";
 
 	q = mysql.format(q,[imgId,type])
 
@@ -102,15 +102,15 @@ function getImageId(imgObj,cb) {
 			"AND zoom_1_coord = ? " +
 			"AND zoom_2_coord = ? " +
 			"AND zoom_3_coord = ? " +
-			"AND zoom_4_coord = ?";
+			"AND zoom_4_coord IS NULL";
 
 	q = mysql.format(q,[
 		imgObj['cube_id'],
 		imgObj['direction'],
 		imgObj['zoom_coords'][0],
 		imgObj['zoom_coords'][1],
-		imgObj['zoom_coords'][2],
-		imgObj['zoom_coords'][3]
+		imgObj['zoom_coords'][2]
+		// imgObj['zoom_coords'][3]
 	])
 
 	pool.query(q, function(err, rows, fields) {
@@ -187,9 +187,9 @@ function addDetection(imgObj,detection,type,cb) {
 	// TODO: If imgObj isn't in database, add it
 	getImageId(imgObj,function(err,imgId){
 		if (err == 'NoImageError'){
-			addImage(imgObj,function(err,imgId){
+			addImage(imgObj,function(err,addedImgId){
 				// The image has been added to the DB. Add the detection.
-				params.push(imgId)
+				params.push(addedImgId)
 				query(q,params)
 			})
 		} else if (err) {
