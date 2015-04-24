@@ -13,8 +13,17 @@ CREATE TABLE images
 	zoom_1_coord tinyint,
 	zoom_2_coord tinyint,
 	zoom_3_coord tinyint,
-	zoom_4_coord tinyint
+	zoom_4_coord tinyint,
+	detector_ran boolean
 );
+
+CREATE TABLE image_detection_runs
+(
+	id int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	image_id int NOT NULL,
+	detection_type varchar(50) NOT NULL
+);
+
 CREATE INDEX cube_id_index
 ON images (cube_id);
 

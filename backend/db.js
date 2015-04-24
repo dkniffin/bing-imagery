@@ -30,7 +30,7 @@ function detections(imgObj,type,cb) {
 	// cb -> function(detections,err)
 	// console.log('DB: getting db detections')
 	getImageId(imgObj,function(err,imgId){
-		// console.log('DB: image id ' + err + ' ' + imgId)
+		console.log('DB: image id ' + err + ' ' + imgId)
 		if (err == 'NoImageError') {
 			addImage(imgObj,function(err,result){
 				if (err != null) {
@@ -42,7 +42,14 @@ function detections(imgObj,type,cb) {
 		} else if (err) {
 			cb(err,null)
 		} else {
-			getDetectionsFromImgId(imgId,type,cb)
+			getDetectorRuns(imgId,type,function(err,id){
+				console.log("DB: img id " + imgId + " detector runs: " + err + ' ' + id)
+				if (err != null) {
+					cb(err,null)
+				} else {
+					getDetectionsFromImgId(imgId,type,cb)
+				}
+			})
 		}
 	})
 }
@@ -87,8 +94,6 @@ function getDetectionsFromImgId(imgId,type,cb) {
 	pool.query(q, function(err, rows, fields) {
 		if (err) {
 			cb(err,null)
-		} else if (rows.length == 0) {
-			cb('NoDetectionsError',null)
 		} else {
 			cb(null,rows)
 		}
@@ -202,11 +207,53 @@ function addDetection(imgObj,detection,type,cb) {
 	})
 }
 
+function detectorRan(imgObj,type){
+	getImageId(imgObj,function(err,imgId){
+		if (err) throw err;
+
+		var q = "INSERT INTO image_detection_runs (image_id,detection_type)" +
+		        "VALUES (?,?)"
+
+		q = mysql.format(q,[
+			imgId,
+			type
+		])
+
+		pool.query(q, function(err, rows, fields) {
+			if (err) throw err;
+		});
+	})
+}
+
+function getDetectorRuns(imgId,type,cb){
+	var q = "SELECT * FROM image_detection_runs " +
+			"WHERE image_id = ? " +
+			"AND detection_type = ? ";
+
+	q = mysql.format(q,[
+		imgId,
+		type
+	])
+
+	pool.query(q, function(err, rows, fields) {
+		if (err) {
+			cb(err,null)
+		} else if (rows.length == 0) {
+			cb('NoDetectionsError',null)
+		} else {
+			rows.forEach(function(row){
+				cb(null,row['id'])
+			})
+		}
+	});
+}
+
 module.exports = exports = {
 	detections: detections,
 	detectionsInBounds: detectionsInBounds,
 	getDetectionsFromImageId: getDetectionsFromImgId,
 	getImageId: getImageId,
 	addImage: addImage,
-	addDetection: addDetection
+	addDetection: addDetection,
+	detectorRan: detectorRan
 }

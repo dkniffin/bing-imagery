@@ -151,6 +151,8 @@ exports.getDetections = function(n,s,e,w,type,cb) {
 					worker.on('message',function(msg){
 						var detections = msg.detections;
 
+						db.detectorRan(imgObj,type);
+
 						async.each(detections,function(detection, detect_cb){
 							// Add detections to the database
 							db.addDetection(imgObj,detection,type)
