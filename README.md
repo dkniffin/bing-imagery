@@ -13,7 +13,7 @@ Installation
 ------------
 - Install opencv
   - Install it via your chosen package manager, if it's available
-  - Hint for windows: check out (chocolatey)[https://chocolatey.org/]
+  - Hint for windows: check out [chocolatey](https://chocolatey.org/)
   - Otherwise, you can find OpenCV's install instructions [here](http://docs.opencv.org/doc/tutorials/introduction/linux_install/linux_install.html).
 - Install [node.js](https://nodejs.org/)
 - Install mysql
