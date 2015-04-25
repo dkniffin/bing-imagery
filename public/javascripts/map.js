@@ -5,6 +5,7 @@ var m;
 var map = {
 	init: function() {
 		m = L.map('myMap',{maxZoom: 22}).setView([40.018,-105.2755], 18);
+    m.zoomControl.setPosition('topright');
 		// Layers
 		var osm = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 			{maxNativeZoom: 19, maxZoom: 22});

@@ -1,17 +1,27 @@
 #main {
 	position: absolute;
 	right: 0;
-	left: 250px;
+	left: 0;
 	top: 0;
 	bottom: 0;
 }
 #sidebar {
 	position: absolute;
-	width: 250px;
+	width: 17%;
 	left: 0;
 	top: 0;
 	bottom: 0;
+	background-color: rgba(255, 255, 255, 0.75);
 }
+
+#title {
+	font-family: 'Roboto', sans-serif;
+	font-size: 18;
+  margin-top: 20px;
+  text-align: center;
+	width: 100%;
+}
+
 #myMap {
 	position: relative;
 	width: 100%;
@@ -20,6 +30,7 @@
 
 .modal {
 	display: none;
+	left: 17% !important;
 }
 
 .modalRow {

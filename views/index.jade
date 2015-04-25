@@ -6,6 +6,7 @@ head
     link(href='javascripts/leaflet/leaflet.css', rel='stylesheet', type='text/css')
     link(href='stylesheets/leaflet-locationfilter.css', rel='stylesheet', type='text/css')
     link(href='stylesheets/MarkerCluster.Default.css', rel='stylesheet', type='text/css')
+    link(href='http://fonts.googleapis.com/css?family=Roboto', rel='stylesheet', type='text/css')
 
     script(type='text/javascript', src='http://code.jquery.com/jquery-2.1.1.min.js')
     script(type='text/javascript', src='javascripts/jquery.easyModal.js')
@@ -25,7 +26,7 @@ head
     #main
       #myMap
     #sidebar
-      button#start(onclick='send();') Start
+      div#title StreetSideCV
       select#classifier(style='display: block;')
         option( value='faces' ) Faces
         option( value='full_body' ) Full Body
@@ -34,5 +35,9 @@ head
         option( value='license') License Plates
         option( value='housenumbers') Housenumbers (BETA!)
 
-      button.location#loc_times_square Times Square
-      button.location#loc_bing_1cube 1 cube in front of Bing (dev)
+      div#locations
+        button.location#loc_times_square Times Square
+        button.location#loc_bing_1cube 1 cube in front of Bing (dev)
+      
+      button#start(onclick='send();') Start
+

@@ -1,6 +1,7 @@
 // Map = require('./map.js');
 
 map.init();
+var markersById = [];
 
 function getQuadrant(num, rows, cols, pos) {
   if (rows === 1 || cols === 1) return pos;
@@ -51,11 +52,13 @@ function createModal(id, detections) {
       img.onload = function(img, detect_coords){
         var height = parseInt(document.documentElement.clientHeight / 8);
         var hScale = height / 256;
+        var detectWidth = detect_coords.x_max - detect_coords.x_min;
+        var detectHeight = detect_coords.y_max - detect_coords.y_min;
         this.drawImage(img, 0, 0, 128, height)
         this.beginPath();
-        this.rect(detect_coords.x_min / 2, detect_coords.y_min * hScale,
-         (detect_coords.x_max - detect_coords.x_min) / 2, (detect_coords.y_max - detect_coords.y_min) * hScale);
+        this.rect(detect_coords.x_min / 2, detect_coords.y_min * hScale, detectWidth / 2, detectHeight * hScale);
         this.strokeStyle = 'red';
+        this.lineWidth=2;
         this.stroke();
       }.bind(ctx, img, detection.detect_coords)
 
@@ -86,9 +89,8 @@ function pad(num, size) {
    return s;
 }
 
-
-
 document.getElementById("start").onclick = function() {
+  console.log('clicked start');
 
   // Object for storing detections
   // Should map cube_id to arrays of detections
@@ -100,12 +102,13 @@ document.getElementById("start").onclick = function() {
   data['type'] = type;
   //send stuff to the backend
   bi.send(data,function(detection){
-    console.log(detection);
     var base4_id_string = pad(base4(detection.cube_id),16);
+    console.log(markersById);
 
-  	if (detections[detection.cube_id] == null) {
+  	if (detections[detection.cube_id] == null && markersById.indexOf(detection.cube_id) === -1) {
   		detections[detection.cube_id] = [];
   		var marker = map.addMarker(detection.cube_id,detection.lat,detection.lon);
+      markersById.push(detection.cube_id)
 
 			var popup = marker.bindPopup(function() {
         var content = '<div class="img_popup">'
