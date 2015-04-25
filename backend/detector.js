@@ -41,7 +41,7 @@ function getBuffer(url,cb) {
 
 function opencvDetect(buffer,cb) {
   opencv.readImage(buffer, function(err, im){
-    im.detectObject(type_cascade_map[type], {}, cb);
+    im.detectObject("cascades/" + type_cascade_map[type], {}, cb);
   });
 }
 
