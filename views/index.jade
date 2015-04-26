@@ -10,6 +10,8 @@ head
 
     script(type='text/javascript', src='http://code.jquery.com/jquery-2.1.1.min.js')
     script(type='text/javascript', src='javascripts/jquery.easyModal.js')
+    script(type='text/javascript', src='javascripts/ProgressBar.js')
+
     script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js')
     script(type='text/javascript', src='https://cdn.socket.io/socket.io-1.2.0.js')
     script(type='text/javascript', src='javascripts/leaflet/leaflet-src.js')
@@ -38,6 +40,8 @@ head
       div#locations
         button.location#loc_times_square Times Square
         button.location#loc_bing_1cube 1 cube in front of Bing (dev)
+
+      div#progress
       
       button#start(onclick='send();') Start
 

@@ -36,31 +36,40 @@ function createModal(id, detections) {
     }
 
     var url = "http://ecn.t1.tiles.virtualearth.net/tiles/hs" + id + getQuadrant(j, 8, 8, '') +".jpg?g=2981&n=z";
-    var index = _(detections).pluck('url').map(agnosticUrl).indexOf(agnosticUrl(url));
+    var detectionsForUrl = _(detections).filter(
+      function(detection) {
+        return agnosticUrl(detection.url) === agnosticUrl(url);
+      }
+    ).value();
 
-    if (index !== -1) {
-      var detection = detections[index];
+    if (detectionsForUrl.length !== 0) {
 
       var img = new Image;
       var canvas = document.createElement('canvas');
-      canvas.width = 128;
-      canvas.height = parseInt(document.documentElement.clientHeight / 8);
-
+      var canvasHeight = parseInt(document.documentElement.clientHeight / 8);
+      var canvasWidth = 128;
+      
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight
       row.appendChild(canvas);
       var ctx = canvas.getContext('2d');
 
-      img.onload = function(img, detect_coords){
-        var height = parseInt(document.documentElement.clientHeight / 8);
-        var hScale = height / 256;
-        var detectWidth = detect_coords.x_max - detect_coords.x_min;
-        var detectHeight = detect_coords.y_max - detect_coords.y_min;
-        this.drawImage(img, 0, 0, 128, height)
-        this.beginPath();
-        this.rect(detect_coords.x_min / 2, detect_coords.y_min * hScale, detectWidth / 2, detectHeight * hScale);
-        this.strokeStyle = 'red';
-        this.lineWidth=2;
-        this.stroke();
-      }.bind(ctx, img, detection.detect_coords)
+      img.onload = function(img, ds){
+        var hScale = canvasHeight / 256;
+        this.drawImage(img, 0, 0, canvasWidth, canvasHeight)
+
+        for (var i = 0; i < ds.length; i++)
+        {
+          var detect_coords = ds[i].detect_coords;
+          var detectWidth = detect_coords.x_max - detect_coords.x_min;
+          var detectHeight = detect_coords.y_max - detect_coords.y_min;
+          this.beginPath();
+          this.rect(detect_coords.x_min / 2, detect_coords.y_min * hScale, detectWidth / 2, detectHeight * hScale);
+          this.strokeStyle = 'red';
+          this.lineWidth = 2;
+          this.stroke();
+        }
+      }.bind(ctx, img, detectionsForUrl)
 
       img.src = url;
     }
@@ -90,29 +99,30 @@ function pad(num, size) {
 }
 
 document.getElementById("start").onclick = function() {
-  console.log('clicked start');
-
   // Object for storing detections
   // Should map cube_id to arrays of detections
-  var detections = {}
+  var detections = {};
+  var totalImageCount = -1;
+  var imagesProcessed = 0;
 
   var type = document.getElementById('classifier').value;
 
   var data = map.getNSEW();
   data['type'] = type;
   //send stuff to the backend
-  bi.send(data,function(detection){
-    var base4_id_string = pad(base4(detection.cube_id),16);
-    console.log(markersById);
+  bi.send(data, function(detection){
+    var cubeId = detection.cube_id;
+    var base4_id_string = pad(base4(cubeId),16);
 
-  	if (detections[detection.cube_id] == null && markersById.indexOf(detection.cube_id) === -1) {
-  		detections[detection.cube_id] = [];
-  		var marker = map.addMarker(detection.cube_id,detection.lat,detection.lon);
-      markersById.push(detection.cube_id)
+    detections[cubeId] = detections[cubeId] || []
+
+  	if (detections[cubeId].length === 0 && markersById.indexOf(cubeId) === -1) {
+  		var marker = map.addMarker(cubeId,detection.lat,detection.lon);
+      markersById.push(cubeId)
 
 			var popup = marker.bindPopup(function() {
         var content = '<div class="img_popup">'
-        detections[detection.cube_id].forEach(function(d){
+        detections[cubeId].forEach(function(d){
           var w = d.detect_coords.x_max - d.detect_coords.x_min;
           // var w = 50;
           var h = d.detect_coords.y_max - d.detect_coords.y_min;
@@ -141,7 +151,7 @@ document.getElementById("start").onclick = function() {
             var direction = url.slice(url.indexOf('.jpg') - 5, url.indexOf('.jpg') - 3);
             var id = base4_id_string + direction;
             if (!document.getElementById(id)) {
-              createModal(id, detections[detection.cube_id]);
+              createModal(id, detections[cubeId]);
             }
             else {
               $('#'+id).trigger('openModal');
@@ -153,12 +163,13 @@ document.getElementById("start").onclick = function() {
 
 
   	}
-  	detections[detection.cube_id].push(detection)
+  	detections[cubeId].push(detection)
 
 
   },function(count){
-    console.log('Processing ' + count + ' images.');
+    totalImageCount = count;
   },function(){
-    console.log('Finished processing an image');
+    imagesProcessed++;
+    console.log(imagesProcessed/totalImageCount);
   });
 }

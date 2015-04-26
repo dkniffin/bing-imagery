@@ -45,7 +45,6 @@ function opencvDetect(buffer,cb) {
   });
 }
 
-console.log('running detector on ' + url)
 getBuffer(url,function(buffer){
   opencvDetect(buffer,function(err, detections){
     // console.log(detections)
