@@ -79,7 +79,7 @@
 }
 
 #start {
-	height: 50px;
+	min-height: 50px;
 	width: 200px;
 	background-color: aliceblue;
 	/*background-color: green;*/
@@ -92,6 +92,7 @@
   align-items: center;
   margin-top: 20%;
   font-family: 'Ubuntu', sans-serif;
+  text-align: center;
 
 }
 
@@ -99,9 +100,12 @@
 	cursor: pointer;
 }
 
-#start.button:hover, #start.progress {
+#start.button:hover {
 	background-color: #537899;
 	color: white;
+}
+#start.progress {
+	background-color: #AAA596
 }
 
 /*-------------------------------*/

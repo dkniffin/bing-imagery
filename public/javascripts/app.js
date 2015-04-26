@@ -98,9 +98,18 @@ function pad(num, size) {
    return s;
 }
 
+function progressString(i, c) {
+  return Math.round(100 * i / c) + '% Processed';
+}
+
 document.getElementById("start").onclick = function() {
   // Object for storing detections
   // Should map cube_id to arrays of detections
+
+  if ( $("#start").attr('class') === 'progress' ) return;
+
+  $("#start").attr('class', 'progress');
+
   var detections = {};
   var totalImageCount = -1;
   var imagesProcessed = 0;
@@ -166,10 +175,19 @@ document.getElementById("start").onclick = function() {
   	detections[cubeId].push(detection)
 
 
-  },function(count){
+  },function(count) {
     totalImageCount = count;
-  },function(){
+    $("#start").html(progressString(imagesProcessed, totalImageCount));
+  },
+  function() {
     imagesProcessed++;
-    console.log(imagesProcessed/totalImageCount);
+    if (imagesProcessed === totalImageCount) {
+      totalImageCount = -1;
+      imagesProcessed = 0;
+      $("#start").attr('class', 'button');
+      $("#start").html('Start');
+      return;
+    }
+    $("#start").html(progressString(imagesProcessed, totalImageCount));
   });
 }
