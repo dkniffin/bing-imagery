@@ -105,7 +105,7 @@ document.getElementById("start").onclick = function() {
   var totalImageCount = -1;
   var imagesProcessed = 0;
 
-  var type = document.getElementById('classifier').value;
+  var type = document.getElementById('dropdown').value;
 
   var data = map.getNSEW();
   data['type'] = type;

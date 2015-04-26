@@ -51,22 +51,22 @@ $('.location').each(function(i,element){
       	ne = L.latLng(40.75814979112882,-73.98533195257187)
         sw = L.latLng(40.75779627463774,-73.98581206798553);
         break;
-      case 'loc_bing_1cube':
-      	ne = L.latLng(40.01804329142695,-105.27583345770836);
-      	sw = L.latLng(40.018010425046754,-105.27586363255978);
-      	break;
+      // case 'loc_bing_1cube':
+      // 	ne = L.latLng(40.01804329142695,-105.27583345770836);
+      // 	sw = L.latLng(40.018010425046754,-105.27586363255978);
+      // 	break;
       case 'loc_pearl_street':
       	ne = L.latLng(40.01885621576159,-105.27602791786192);
-		sw = L.latLng(40.017418313954614,-105.28151035308838);
-		break;
-	  case 'loc_herald_square':
-	  	ne = L.latLng(40.75078650776183,-73.98761451244354);
-		sw = L.latLng(40.749638461019245,-73.98799002170563);
-		break;
-	  case 'loc_world_trade_center':
-	  	ne = L.latLng(40.71025049199978,-74.01247054338455);
-		sw = L.latLng(40.70967205495463,-74.01294529438019);
-		break;
+		    sw = L.latLng(40.017418313954614,-105.28151035308838);
+    		break;
+  	  case 'loc_herald_square':
+  	  	ne = L.latLng(40.75078650776183,-73.98761451244354);
+    		sw = L.latLng(40.749638461019245,-73.98799002170563);
+    		break;
+  	  case 'loc_world_trade_center':
+  	  	ne = L.latLng(40.71025049199978,-74.01247054338455);
+  		  sw = L.latLng(40.70967205495463,-74.01294529438019);
+    		break;
     }
 
     var bounds = L.latLngBounds(ne,sw);
