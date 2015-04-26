@@ -112,8 +112,8 @@ function imgURLs(id,dirs,zoom,cb) {
 //  count_cb - callback to return number of images to be processed
 //  fin_cb   - callback for finished image
 exports.getDetections = function(n,s,e,w,type,d_cb,count_cb,fin_cb) {
-	// console.log("ne = L.latLng("+ n + "," + e + ");");
-	// console.log("sw = L.latLng("+ s + "," + w + ");");
+	console.log("ne = L.latLng("+ n + "," + e + ");");
+	console.log("sw = L.latLng("+ s + "," + w + ");");
 	var zoom = 3
 	var dirs = ['LEFT','RIGHT']
 
