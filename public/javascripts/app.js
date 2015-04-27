@@ -46,7 +46,7 @@ function createModal(id, detections) {
 
       var img = new Image;
       var canvas = document.createElement('canvas');
-      var canvasHeight = parseInt(document.documentElement.clientHeight / 8);
+      var canvasHeight = parseInt(window.innerHeight / 8);
       var canvasWidth = 128;
       
       canvas.width = canvasWidth;
