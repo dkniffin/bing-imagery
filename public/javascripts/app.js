@@ -2,8 +2,7 @@
 
 map.init();
 var markersById = [];
-var totalImageCount = -1;
-var imagesProcessed = 0;
+
 
 
 function getQuadrant(num, rows, cols, pos) {
@@ -101,6 +100,10 @@ function pad(num, size) {
    return s;
 }
 
+function setStartHTML(i, c) {
+  $("#start").html(Math.round(100 * i / c) + '% Processed');
+}
+
 document.getElementById("start").onclick = function() {
   // Object for storing detections
   // Should map cube_id to arrays of detections
@@ -111,6 +114,8 @@ document.getElementById("start").onclick = function() {
   setStartHTML(0, 1);
 
   var detections = {};
+  var totalImageCount = -1;
+  var imagesProcessed = 0;
 
   var type = document.getElementById('dropdown').value;
 
@@ -123,11 +128,11 @@ document.getElementById("start").onclick = function() {
 
     detections[cubeId] = detections[cubeId] || []
 
-  	if (detections[cubeId].length === 0 && markersById.indexOf(cubeId) === -1) {
-  		var marker = map.addMarker(cubeId,detection.lat,detection.lon);
+    if (detections[cubeId].length === 0 && markersById.indexOf(cubeId) === -1) {
+      var marker = map.addMarker(cubeId,detection.lat,detection.lon);
       markersById.push(cubeId)
 
-			var popup = marker.bindPopup(function() {
+      var popup = marker.bindPopup(function() {
         var content = '<div class="img_popup">'
         detections[cubeId].forEach(function(d){
           var w = d.detect_coords.x_max - d.detect_coords.x_min;
@@ -169,37 +174,31 @@ document.getElementById("start").onclick = function() {
       })
 
 
-  	}
-  	detections[cubeId].push(detection)
+    }
+    detections[cubeId].push(detection)
 
 
   },function(count) {
     if (count === 0) {
-      endProgress();
+        totalImageCount = -1;
+        imagesProcessed = 0;
+        $("#start").attr('class', 'button');
+        $("#start").html('Start');
       return;
     }
     totalImageCount = count;
-    imagesProcessed = 0;
-    setStartHTML(0, 1);
+    setStartHTML(imagesProcessed, totalImageCount);
   },
   function() {
     imagesProcessed++;
     if (imagesProcessed === totalImageCount) {
-      endProgress();
+        totalImageCount = -1;
+        imagesProcessed = 0;
+        $("#start").attr('class', 'button');
+        $("#start").html('Start');
+
       return;
     }
     setStartHTML(imagesProcessed, totalImageCount);
   });
 }
-
-function setStartHTML(i, c) {
-  $("#start").html(Math.round(100 * i / c) + '% Processed');
-}
-
-function endProgress() {
-  totalImageCount = -1;
-  imagesProcessed = 0;
-  $("#start").attr('class', 'button');
-  $("#start").html('Start');
-}
-
