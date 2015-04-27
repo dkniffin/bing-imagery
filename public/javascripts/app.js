@@ -46,7 +46,7 @@ function createModal(id, detections) {
 
       var img = new Image;
       var canvas = document.createElement('canvas');
-      var canvasHeight = parseInt(document.documentElement.clientHeight / 8);
+      var canvasHeight = parseInt(window.innerHeight / 8);
       var canvasWidth = 128;
       
       canvas.width = canvasWidth;
@@ -98,8 +98,8 @@ function pad(num, size) {
    return s;
 }
 
-function progressString(i, c) {
-  return Math.round(100 * i / c) + '% Processed';
+function setStartHTML(i, c) {
+  $("#start").html(Math.round(100 * i / c) + '% Processed');
 }
 
 document.getElementById("start").onclick = function() {
@@ -109,6 +109,7 @@ document.getElementById("start").onclick = function() {
   if ( $("#start").attr('class') === 'progress' ) return;
 
   $("#start").attr('class', 'progress');
+  setStartHTML(0, 1);
 
   var detections = {};
   var totalImageCount = -1;
@@ -177,7 +178,7 @@ document.getElementById("start").onclick = function() {
 
   },function(count) {
     totalImageCount = count;
-    $("#start").html(progressString(imagesProcessed, totalImageCount));
+    setStartHTML(imagesProcessed, totalImageCount);
   },
   function() {
     imagesProcessed++;
@@ -188,6 +189,6 @@ document.getElementById("start").onclick = function() {
       $("#start").html('Start');
       return;
     }
-    $("#start").html(progressString(imagesProcessed, totalImageCount));
+    setStartHTML(imagesProcessed, totalImageCount);
   });
 }
