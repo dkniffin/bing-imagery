@@ -81,7 +81,8 @@
 #start {
 	min-height: 50px;
 	width: 200px;
-	background-color: aliceblue;
+	background-color: #537899;
+	color: white;
 	/*background-color: green;*/
 	border-radius: 10px;
   /*border: 2;*/
@@ -101,11 +102,12 @@
 }
 
 #start.button:hover {
-	background-color: #537899;
-	color: white;
+	background-color: #AAA596;
+	color: black;
 }
 #start.progress {
-	background-color: #AAA596
+	background-color: #AAA596;
+	color: black;
 }
 
 /*-------------------------------*/
