@@ -2,6 +2,9 @@
 
 map.init();
 var markersById = [];
+var totalImageCount = -1;
+var imagesProcessed = 0;
+
 
 function getQuadrant(num, rows, cols, pos) {
   if (rows === 1 || cols === 1) return pos;
@@ -98,10 +101,6 @@ function pad(num, size) {
    return s;
 }
 
-function setStartHTML(i, c) {
-  $("#start").html(Math.round(100 * i / c) + '% Processed');
-}
-
 document.getElementById("start").onclick = function() {
   // Object for storing detections
   // Should map cube_id to arrays of detections
@@ -112,8 +111,6 @@ document.getElementById("start").onclick = function() {
   setStartHTML(0, 1);
 
   var detections = {};
-  var totalImageCount = -1;
-  var imagesProcessed = 0;
 
   var type = document.getElementById('dropdown').value;
 
@@ -177,18 +174,32 @@ document.getElementById("start").onclick = function() {
 
 
   },function(count) {
+    if (count === 0) {
+      endProgress();
+      return;
+    }
     totalImageCount = count;
-    setStartHTML(imagesProcessed, totalImageCount);
+    imagesProcessed = 0;
+    setStartHTML(0, 1);
   },
   function() {
     imagesProcessed++;
     if (imagesProcessed === totalImageCount) {
-      totalImageCount = -1;
-      imagesProcessed = 0;
-      $("#start").attr('class', 'button');
-      $("#start").html('Start');
+      endProgress();
       return;
     }
     setStartHTML(imagesProcessed, totalImageCount);
   });
 }
+
+function setStartHTML(i, c) {
+  $("#start").html(Math.round(100 * i / c) + '% Processed');
+}
+
+function endProgress() {
+  totalImageCount = -1;
+  imagesProcessed = 0;
+  $("#start").attr('class', 'button');
+  $("#start").html('Start');
+}
+
