@@ -9,7 +9,7 @@ var map = {
 		// Layers
 		var osm = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 			{maxNativeZoom: 19, maxZoom: 22});
-		var bing = new L.BingLayer("Ao0pgKJiEzVEWKCChHTB5JBezW9XvoM4WESpeYywz8wBY9kkWrZWNdKBZmmqz21Y",
+		var bing = new L.BingLayer("AlPQKsVzpW3Mambz8Iyvlzo2-j08raccw7lqq6mqgWBx3hMpCxaDpO44fe39iUYZ",
 			{maxNativeZoom: 19, maxZoom: 22});
 		m.addLayer(bing);
 		m.addControl(new L.Control.Layers({'OSM':osm, "Bing":bing}, {}));
